@@ -495,21 +495,6 @@ func (m *Services) Validate() error {
 		}
 	}
 
-	{
-		tmp := m.GetRecorder()
-
-		if v, ok := interface{}(tmp).(interface{ Validate() error }); ok {
-
-			if err := v.Validate(); err != nil {
-				return ServicesValidationError{
-					field:  "Recorder",
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-	}
-
 	return nil
 }
 

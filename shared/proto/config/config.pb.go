@@ -794,7 +794,6 @@ type Services struct {
 	Account              *Service `protobuf:"bytes,1,opt,name=account,proto3" json:"account,omitempty"`
 	Greeter              *Service `protobuf:"bytes,2,opt,name=greeter,proto3" json:"greeter,omitempty"`
 	Emailer              *Service `protobuf:"bytes,3,opt,name=emailer,proto3" json:"emailer,omitempty"`
-	Recorder             *Service `protobuf:"bytes,4,opt,name=recorder,proto3" json:"recorder,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -850,13 +849,6 @@ func (m *Services) GetGreeter() *Service {
 func (m *Services) GetEmailer() *Service {
 	if m != nil {
 		return m.Emailer
-	}
-	return nil
-}
-
-func (m *Services) GetRecorder() *Service {
-	if m != nil {
-		return m.Recorder
 	}
 	return nil
 }
@@ -1791,18 +1783,7 @@ func (m *Services) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if m.Recorder != nil {
-		{
-			size, err := m.Recorder.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintConfig(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x22
-	}
+
 	if m.Emailer != nil {
 		{
 			size, err := m.Emailer.MarshalToSizedBuffer(dAtA[:i])
@@ -2215,10 +2196,6 @@ func (m *Services) Size() (n int) {
 	}
 	if m.Emailer != nil {
 		l = m.Emailer.Size()
-		n += 1 + l + sovConfig(uint64(l))
-	}
-	if m.Recorder != nil {
-		l = m.Recorder.Size()
 		n += 1 + l + sovConfig(uint64(l))
 	}
 	if m.XXX_unrecognized != nil {
@@ -4126,12 +4103,6 @@ func (m *Services) Unmarshal(dAtA []byte) error {
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
-			}
-			if m.Recorder == nil {
-				m.Recorder = &Service{}
-			}
-			if err := m.Recorder.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
 			}
 			iNdEx = postIndex
 		default:

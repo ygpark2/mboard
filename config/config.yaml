@@ -27,9 +27,6 @@ services:
   emailer:
     endpoint: dns:///emailer.test:8082
     version: v0.1.0
-  recorder:
-    endpoint: dns:///recorder.test:8083
-    version: v0.1.0
 
 features:
   metrics:
@@ -49,7 +46,4 @@ features:
   validator:
     enabled: true
   reqlogs:
-    enabled: true
-  translogs:
-    topic: mkit.service.recorder
     enabled: true

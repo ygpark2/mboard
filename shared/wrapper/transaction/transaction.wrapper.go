@@ -1,15 +1,13 @@
 package transaction
 
 import (
-    "context"
+	"context"
 
-    "github.com/golang/protobuf/proto"
-    "github.com/golang/protobuf/ptypes/empty"
-    "github.com/micro/go-micro/v2"
-    "github.com/micro/go-micro/v2/server"
-    "github.com/rs/zerolog/log"
-
-    transactionPB "github.com/ygpark2/mboard/service/recorder/proto/transaction"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/micro/go-micro/v2"
+	"github.com/micro/go-micro/v2/server"
+	"github.com/rs/zerolog/log"
 )
 
 func publish(ctx context.Context, publisher micro.Event, req, rsp proto.Message) (err error) {

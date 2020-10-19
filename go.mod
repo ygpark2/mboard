@@ -12,7 +12,7 @@ require (
 	github.com/infobloxopen/protoc-gen-gorm v0.20.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lyft/protoc-gen-star v0.5.2 // indirect
-	github.com/markbates/pkger v0.17.0
+	github.com/markbates/pkger v0.17.1
 	github.com/micro/go-micro/v2 v2.9.0
 	github.com/micro/go-micro/v3 v3.0.0-beta.3.0.20201013135405-1a962e46fd3a
 	github.com/micro/micro/v3 v3.0.0-beta.6.0.20201013185315-1be1d35092ff
@@ -25,12 +25,13 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/thoas/go-funk v0.6.0
 	github.com/xmlking/configor v0.1.0
-	github.com/xmlking/micro-starter-kit v0.3.7
+	github.com/xmlking/micro-starter-kit v0.3.7 // indirect
 	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
 	golang.org/x/tools v0.0.0-20201013201025-64a9e34f3752 // indirect
 	google.golang.org/genproto v0.0.0-20201001141541-efaab9d3c4f7
 	google.golang.org/grpc v1.32.0
 	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.0 // indirect
+	google.golang.org/grpc/examples v0.0.0-20201016185254-4be647f7f6db // indirect
 	google.golang.org/protobuf v1.25.0
 	gorm.io/gorm v1.20.2
 )

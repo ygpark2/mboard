@@ -94,7 +94,6 @@ message Services {
     Service account = 1;
     Service greeter = 2;
     Service emailer = 3;
-    Service recorder = 4;
 }
 
 message Configuration {

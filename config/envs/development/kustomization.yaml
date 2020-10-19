@@ -81,6 +81,3 @@ images:
   - name: xmlking/greeter-service
     newName: docker.pkg.github.com/ygpark2/mboard/greeter-service
     newTag: $(IMAGE_VERSION)
-  - name: xmlking/recorder-service
-    newName: docker.pkg.github.com/ygpark2/mboard/recorder-service
-    newTag: $(IMAGE_VERSION)

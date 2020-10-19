@@ -34,7 +34,6 @@ configMapGenerator:
       # - SERVICES_ACCOUNT_ENDPOINT=$(ACCOUNT_SERVICE_ENDPOINT)
       # - SERVICES_GREETER_ENDPOINT=$(GREETER_SERVICE_ENDPOINT)
       # - SERVICES_EMAILER_SERVICE_ENDPOINT=$(EMAILER_SERVICE_ENDPOINT)
-      # - SERVICES_RECORDER_ENDPOINT=$(RECORDER_SERVICE_ENDPOINT)
       # - FEATURES_MTLS_ENABLED=true
       # - INSECURE_SKIP_VERIFY=true
       - FEATURES_REQLOGS_ENABLED=true
@@ -73,7 +72,4 @@ images:
     newTag: $(IMAGE_VERSION)
   - name: xmlking/greeter-service
     newName: docker.pkg.github.com/ygpark2/mboard/greeter-service
-    newTag: $(IMAGE_VERSION)
-  - name: xmlking/recorder-service
-    newName: docker.pkg.github.com/ygpark2/mboard/recorder-service
     newTag: $(IMAGE_VERSION)
