@@ -7,7 +7,7 @@ import (
 
     "google.golang.org/grpc/resolver"
 
-    "github.com/xmlking/micro-starter-kit/shared/config"
+    "github.com/ygpark2/mboard/shared/config"
 )
 
 // CONFIGOR_DEBUG_MODE=true go test -v ./shared/config/... -count=1

@@ -10,7 +10,7 @@ import (
     "github.com/rs/zerolog"
     "github.com/rs/zerolog/log"
     // bootstrap logger
-    "github.com/xmlking/micro-starter-kit/shared/logger"
+    "github.com/ygpark2/mboard/shared/logger"
 )
 
 func TestLogger(t *testing.T) {

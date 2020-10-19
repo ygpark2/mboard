@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-    "github.com/xmlking/micro-starter-kit/shared/config"
+    "github.com/ygpark2/mboard/shared/config"
 )
 
 func TestSendEmail_Send(t *testing.T) {

@@ -13,10 +13,10 @@ import (
     "github.com/rs/zerolog"
     uuid "github.com/satori/go.uuid"
 
-    account_entities "github.com/xmlking/micro-starter-kit/service/account/proto/entities"
-    profilePB "github.com/xmlking/micro-starter-kit/service/account/proto/profile"
-    "github.com/xmlking/micro-starter-kit/service/account/repository"
-    myErrors "github.com/xmlking/micro-starter-kit/shared/errors"
+    account_entities "github.com/ygpark2/mboard/service/account/proto/entities"
+    profilePB "github.com/ygpark2/mboard/service/account/proto/profile"
+    "github.com/ygpark2/mboard/service/account/repository"
+    myErrors "github.com/ygpark2/mboard/shared/errors"
 )
 
 // ProfileHandler struct

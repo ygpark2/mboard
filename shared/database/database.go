@@ -7,8 +7,8 @@ import (
     "github.com/jinzhu/gorm"
     "github.com/rs/zerolog/log"
 
-    "github.com/xmlking/micro-starter-kit/shared/logger/gormlog"
-    configPB "github.com/xmlking/micro-starter-kit/shared/proto/config"
+    "github.com/ygpark2/mboard/shared/logger/gormlog"
+    configPB "github.com/ygpark2/mboard/shared/proto/config"
 )
 
 // GetDatabaseConnection return (gorm.DB or error)

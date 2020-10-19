@@ -14,8 +14,8 @@ import (
     "github.com/xmlking/configor"
     "google.golang.org/grpc/resolver"
 
-    configPB "github.com/xmlking/micro-starter-kit/shared/proto/config"
-    uTLS "github.com/xmlking/micro-starter-kit/shared/util/tls"
+    configPB "github.com/ygpark2/mboard/shared/proto/config"
+    uTLS "github.com/ygpark2/mboard/shared/util/tls"
 )
 
 var (
