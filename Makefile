@@ -2,27 +2,27 @@
 # make        	# compile all binary
 # make clean  	# remove ALL binaries and objects
 # make release  # add git TAG and push
-GITHUB_REPO_OWNER 				:= xmlking
-GITHUB_REPO_NAME 					:= micro-starter-kit
+GITHUB_REPO_OWNER 			:= ygpark2
+GITHUB_REPO_NAME 			:= mboard
 GITHUB_RELEASES_UI_URL 		:= https://github.com/$(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)/releases
 GITHUB_RELEASES_API_URL 	:= https://api.github.com/repos/$(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)/releases
 GITHUB_RELEASE_ASSET_URL	:= https://uploads.github.com/repos/$(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)/releases
-GITHUB_DEPLOY_API_URL			:= https://api.github.com/repos/$(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)/deployments
-DOCKER_REGISTRY 					:= docker.pkg.github.com
-# DOCKER_REGISTRY 					:= us.gcr.io
-DOCKER_CONTEXT_PATH 			:= $(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)
-# DOCKER_REGISTRY 					:= docker.io
-# DOCKER_CONTEXT_PATH 			:= xmlking
-GO_MICRO_VERSION 					:= latest
+GITHUB_DEPLOY_API_URL		:= https://api.github.com/repos/$(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)/deployments
+DOCKER_REGISTRY 			:= docker.pkg.github.com
+# DOCKER_REGISTRY 			:= us.gcr.io
+DOCKER_CONTEXT_PATH 		:= $(GITHUB_REPO_OWNER)/$(GITHUB_REPO_NAME)
+# DOCKER_REGISTRY 			:= docker.io
+# DOCKER_CONTEXT_PATH 		:= ygpark2
+GO_MICRO_VERSION 			:= latest
 
 VERSION					:= $(shell git describe --tags || echo "HEAD")
 GOPATH					:= $(shell go env GOPATH)
-CODECOV_FILE 		:= build/coverage.txt
+CODECOV_FILE 			:= build/coverage.txt
 TIMEOUT  				:= 60s
 # don't override
 GIT_TAG					:= $(shell git describe --tags --abbrev=0 --always --match "v*")
-GIT_DIRTY 			:= $(shell git status --porcelain 2> /dev/null)
-GIT_BRANCH  		:= $(shell git rev-parse --abbrev-ref HEAD)
+GIT_DIRTY 				:= $(shell git status --porcelain 2> /dev/null)
+GIT_BRANCH  			:= $(shell git rev-parse --abbrev-ref HEAD)
 HAS_GOVVV				:= $(shell command -v govvv 2> /dev/null)
 HAS_PKGER				:= $(shell command -v pkger 2> /dev/null)
 HAS_KO					:= $(shell command -v ko 2> /dev/null)
@@ -113,10 +113,11 @@ proto proto-%:
 
 proto_shared:
 	@for f in ./shared/proto/**/*.proto; do \
-		protoc --proto_path=.:${GOPATH}/src \
-		--gofast_out=plugins=grpc,paths=source_relative:. \
-		--validate_out=lang=gogo,paths=source_relative:. $$f; \
-		echo ✓ compiled: $$f; \
+		protoc -I vendor/github.com/envoyproxy/protoc-gen-validate \
+				--proto_path=.:${GOPATH}/src \
+				--gofast_out=plugins=grpc,paths=source_relative:. \
+				--validate_out=lang=gogo,paths=source_relative:. $$f; \
+				echo ✓ compiled: $$f; \
 	done
 
 proto_lint:
@@ -211,7 +212,7 @@ check test tests:
 
 run run-%:
 	@if [ -z $(TARGET) ]; then \
-		echo "no  TARGET. example usage: make test TARGET=account"; \
+		echo "no  TARGET. example usage: make run TARGET=account"; \
 	else \
 		go run  ./${TYPE}/${TARGET} ${ARGS}; \
 	fi

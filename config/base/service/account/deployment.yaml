@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: service
-          image: xmlking/account-service:latest
+          image: ygpark2/account-service:latest
           imagePullPolicy: Always
           ports:
             - name: grpc-port

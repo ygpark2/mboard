@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: service
-          image: xmlking/emailer-service:latest
+          image: ygpark2/emailer-service:latest
           imagePullPolicy: Always
           ports:
             - name: grpc-port
