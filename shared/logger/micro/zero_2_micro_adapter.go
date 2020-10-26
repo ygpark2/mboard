@@ -3,7 +3,7 @@ package micro
 import (
     "fmt"
 
-    "github.com/micro/go-micro/v3/logger"
+    "github.com/micro/micro/v3/logger"
     "github.com/rs/zerolog"
 )
 

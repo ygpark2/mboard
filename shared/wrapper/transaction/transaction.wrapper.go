@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/micro/go-micro/v3"
-	"github.com/micro/go-micro/v3/server"
+	"github.com/micro/micro/v3"
+	"github.com/micro/micro/v3/server"
 	"github.com/rs/zerolog/log"
 )
 

@@ -1,9 +1,9 @@
 package main
 
 import (
-    "github.com/micro/go-micro/v3"
-    "github.com/micro/go-micro/v3/client"
-    "github.com/micro/go-micro/v3/server"
+    "github.com/micro/micro/v3"
+    "github.com/micro/micro/v3/client"
+    "github.com/micro/micro/v3/server"
     "github.com/rs/zerolog/log"
 
     "github.com/ygpark2/mboard/shared/constants"

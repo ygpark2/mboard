@@ -4,7 +4,7 @@ import (
     "context"
     "fmt"
 
-    "github.com/micro/go-micro/v3/server"
+    "github.com/micro/micro/v3/server"
 
     "github.com/ygpark2/mboard/shared/errors"
 )

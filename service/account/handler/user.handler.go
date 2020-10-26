@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/jinzhu/gorm"
-	"github.com/micro/go-micro/v3"
-	"github.com/micro/go-micro/v3/auth"
-	"github.com/micro/go-micro/v3/errors"
+	"github.com/micro/micro/v3"
+	"github.com/micro/micro/v3/auth"
+	"github.com/micro/micro/v3/errors"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thoas/go-funk"

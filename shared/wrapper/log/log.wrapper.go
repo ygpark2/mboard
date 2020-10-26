@@ -3,9 +3,9 @@ package log
 import (
 	"context"
 
-	"github.com/micro/go-micro/v3/client"
-	"github.com/micro/go-micro/v3/metadata"
-	"github.com/micro/go-micro/v3/server"
+	"github.com/micro/micro/v3/client"
+	"github.com/micro/micro/v3/metadata"
+	"github.com/micro/micro/v3/server"
 	"github.com/rs/zerolog/log"
 )
 
