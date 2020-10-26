@@ -1,15 +1,16 @@
 package micro
 
 import (
-	"github.com/micro/micro/v3"
-	gc "github.com/micro/micro/v3/client/grpc"
-	gs "github.com/micro/micro/v3/server/grpc"
+	"github.com/micro/go-micro"
+	gc "github.com/micro/micro/v3/service/client/grpc"
+	"github.com/micro/micro/v3/service/options"
+	gs "github.com/micro/micro/v3/service/server/grpc"
 	"github.com/rs/zerolog/log"
 
 	"github.com/ygpark2/mboard/shared/config"
 )
 
-func WithTLS() micro.Option {
+func WithTLS() options.Option {
 	if config.IsSecure() {
 		if tlsConf, err := config.CreateServerCerts(); err != nil {
 			log.Panic().Err(err).Msg("unable to load certs")
@@ -25,5 +26,5 @@ func WithTLS() micro.Option {
 			}
 		}
 	}
-	return func(o *micro.Options) {} // noops
+	return func(o *options.Options) {} // noops
 }

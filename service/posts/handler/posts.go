@@ -7,10 +7,9 @@ import (
 	"math"
 	"time"
 
-	"github.com/micro/micro/v3/errors"
-	gostore "github.com/micro/micro/v3/store"
+	"github.com/micro/micro/v3/service/errors"
+	gostore "github.com/micro/micro/v3/service/store"
 	"github.com/micro/micro/v3/service/logger"
-	"github.com/micro/micro/v3/service/store"
 
 	"github.com/gosimple/slug"
 	pb "github.com/micro/services/blog/posts/proto/posts"

@@ -15,7 +15,7 @@ func main() {
 
 	// Register Handler
 	srv.Handle(&handler.Posts{
-		Tags: tags.NewTagsService("tags", srv.Client()),
+		Tags: tags.NewTagsService("tags", service.Client()),
 	})
 
 	// Run service

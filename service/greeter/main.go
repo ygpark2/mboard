@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/micro/micro/v3"
 	"github.com/micro/micro/v3/client"
 	"github.com/micro/micro/v3/server"
 	"github.com/rs/zerolog/log"
@@ -42,18 +41,18 @@ func main() {
 		subscriberWrappers = append(subscriberWrappers, validatorWrapper.NewSubscriberWrapper())
 	}
 
-	service := micro.NewService(
-		micro.Name(constants.GREETER_SERVICE),
-		micro.Version(config.Version),
+	srv := service.New(
+		service.Name(constants.GREETER_SERVICE),
+		service.Version(config.Version),
 		myMicro.WithTLS(),
 		// Wrappers are applied in reverse order so the last is executed first.
-		micro.WrapClient(clientWrappers...),
+		service.WrapClient(clientWrappers...),
 		// Adding some optional lifecycle actions
-		micro.BeforeStart(func() (err error) {
+		service.BeforeStart(func() (err error) {
 			log.Debug().Msg("called BeforeStart")
 			return
 		}),
-		micro.BeforeStop(func() (err error) {
+		service.BeforeStop(func() (err error) {
 			log.Debug().Msg("called BeforeStop")
 			return
 		}),
@@ -61,14 +60,14 @@ func main() {
 
 	if cfg.Features.Translogs.Enabled {
 		topic := cfg.Features.Translogs.Topic
-		publisher := micro.NewEvent(topic, service.Client())
+		publisher := service.NewEvent(topic, service.Client())
 		handlerWrappers = append(handlerWrappers, transWrapper.NewHandlerWrapper(publisher))
 		subscriberWrappers = append(subscriberWrappers, transWrapper.NewSubscriberWrapper(publisher))
 	}
 
 	service.Init(
-		micro.WrapHandler(handlerWrappers...),
-		micro.WrapSubscriber(subscriberWrappers...),
+		service.WrapHandler(handlerWrappers...),
+		service.WrapSubscriber(subscriberWrappers...),
 	)
 
 	_ = healthPB.RegisterHealthHandler(service.Server(), handler.NewHealthHandler())
@@ -77,7 +76,7 @@ func main() {
 	println(config.GetBuildInfo())
 
 	// Run service
-	if err := service.Run(); err != nil {
+	if err := srv.Run(); err != nil {
 		log.Fatal().Err(err).Send()
 	}
 }

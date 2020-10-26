@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	myErrors "github.com/micro/micro/v3/errors"
+	myErrors "github.com/micro/micro/v3/service/errors"
 )
 
 func TestErrors(t *testing.T) {

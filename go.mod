@@ -6,15 +6,17 @@ require (
 	github.com/DATA-DOG/go-sqlmock v1.4.1 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.4.1
 	github.com/gogo/protobuf v1.3.1
-	github.com/golang/protobuf v1.4.2
+	github.com/golang/protobuf v1.4.3
 	github.com/gosimple/slug v1.9.0
 	github.com/infobloxopen/atlas-app-toolkit v0.21.1
 	github.com/infobloxopen/protoc-gen-gorm v0.20.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/markbates/pkger v0.17.1
 	github.com/mattn/go-sqlite3 v2.0.1+incompatible // indirect
-	github.com/micro/micro/v3 v3.0.0-beta.3.0.20201013135405-1a962e46fd3a
-	github.com/micro/micro/v3 v3.0.0-beta.6.0.20201013185315-1be1d35092ff
+	github.com/micro/go-micro v1.18.0
+	github.com/micro/go-micro/v2 v2.9.1
+	github.com/micro/go-micro/v3 v3.0.0-beta.3.0.20201013135405-1a962e46fd3a // indirect
+	github.com/micro/micro/v3 v3.0.0-beta.7
 	github.com/micro/services v0.13.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.20.0

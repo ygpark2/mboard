@@ -5,12 +5,15 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/micro/micro/v3"
-	"github.com/micro/micro/v3/server"
+
+	"github.com/micro/micro/v3/service/events"
+	"github.com/micro/micro/v3/service/server"
 	"github.com/rs/zerolog/log"
+
+	transactionPB "github.com/ygpark2/mboard/service/recorder/proto/transaction"
 )
 
-func publish(ctx context.Context, publisher micro.Event, req, rsp proto.Message) (err error) {
+func publish(ctx context.Context, publisher events.Event, req, rsp proto.Message) (err error) {
 	reqB, err := proto.Marshal(req)
 	if err != nil {
 		log.Error().Err(err).Msg("marshaling error for req")
@@ -29,7 +32,7 @@ func publish(ctx context.Context, publisher micro.Event, req, rsp proto.Message)
 }
 
 // NewHandlerWrapper return HandlerWrapper which publish transaction event
-func NewHandlerWrapper(p micro.Event) server.HandlerWrapper {
+func NewHandlerWrapper(p events.Event) server.HandlerWrapper {
 	return func(fn server.HandlerFunc) server.HandlerFunc {
 		return func(ctx context.Context, req server.Request, rsp interface{}) (err error) {
 			err = fn(ctx, req, rsp)
@@ -42,7 +45,7 @@ func NewHandlerWrapper(p micro.Event) server.HandlerWrapper {
 }
 
 // NewSubscriberWrapper return SubscriberWrapper which publish transaction event
-func NewSubscriberWrapper(p micro.Event) server.SubscriberWrapper {
+func NewSubscriberWrapper(p events.Event) server.SubscriberWrapper {
 	return func(fn server.SubscriberFunc) server.SubscriberFunc {
 		return func(ctx context.Context, req server.Message) (err error) {
 			err = fn(ctx, req)

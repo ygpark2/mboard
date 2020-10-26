@@ -1,12 +1,12 @@
 package validator
 
 import (
-    "context"
-    "fmt"
+	"context"
+	"fmt"
 
-    "github.com/micro/micro/v3/server"
+	"github.com/micro/micro/v3/service/server"
 
-    "github.com/ygpark2/mboard/shared/errors"
+	"github.com/ygpark2/mboard/shared/errors"
 )
 
 type Validator interface {
@@ -27,16 +27,16 @@ func NewHandlerWrapper() server.HandlerWrapper {
 }
 
 func NewSubscriberWrapper() server.SubscriberWrapper {
-    return func(fn server.SubscriberFunc) server.SubscriberFunc {
-        return func(ctx context.Context, p server.Message) error {
-            if v, ok := p.Payload().(Validator); ok { // Don’t panic!
-                if err := v.Validate(); err != nil {
-                    return errors.ValidationError(fmt.Sprintf("%s", p.Topic()), "validation error: %v", err)
-                }
-            }
-            return fn(ctx, p)
-        }
-    }
+	return func(fn server.SubscriberFunc) server.SubscriberFunc {
+		return func(ctx context.Context, p server.Message) error {
+			if v, ok := p.Payload().(Validator); ok { // Don’t panic!
+				if err := v.Validate(); err != nil {
+					return errors.ValidationError(fmt.Sprintf("%s", p.Topic()), "validation error: %v", err)
+				}
+			}
+			return fn(ctx, p)
+		}
+	}
 }
 
 // TODO: implement client-side Validator

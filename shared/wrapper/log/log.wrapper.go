@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/micro/micro/v3/client"
-	"github.com/micro/micro/v3/metadata"
 	"github.com/micro/micro/v3/server"
 	"github.com/rs/zerolog/log"
 )
@@ -32,7 +31,7 @@ func NewSubscriberWrapper() server.SubscriberWrapper {
 	return func(fn server.SubscriberFunc) server.SubscriberFunc {
 		return func(ctx context.Context, p server.Message) (err error) {
 			md, _ := metadata.FromContext(ctx)
-            log.Debug().Fields(map[string]interface{}{
+			log.Debug().Fields(map[string]interface{}{
 				"category":    "LogWrapper",
 				"Topic":       p.Topic(),
 				"ContentType": p.ContentType(),
@@ -51,7 +50,7 @@ type clientWrapper struct {
 
 func (l *clientWrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) (err error) {
 	md, _ := metadata.FromContext(ctx)
-    log.Debug().Fields(map[string]interface{}{
+	log.Debug().Fields(map[string]interface{}{
 		"category": "LogWrapper",
 		"service":  req.Service(),
 		"method":   req.Method(),
@@ -63,7 +62,7 @@ func (l *clientWrapper) Call(ctx context.Context, req client.Request, rsp interf
 
 func (l *clientWrapper) Publish(ctx context.Context, p client.Message, opts ...client.PublishOption) (err error) {
 	md, _ := metadata.FromContext(ctx)
-    log.Debug().Fields(map[string]interface{}{
+	log.Debug().Fields(map[string]interface{}{
 		"category":    "LogWrapper",
 		"Topic":       p.Topic(),
 		"ContentType": p.ContentType(),
