@@ -34,7 +34,7 @@ message ListRequest {
 message ListResponse {
     option (validate.disabled) = true;
     repeated mkit.service.account.entities.v1.Profile results = 1;
-    uint32 total = 2;
+    int64 total = 2;
 }
 
 message GetRequest {

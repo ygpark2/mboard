@@ -1,9 +1,8 @@
 package micro
 
 import (
-	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/config/options"
 	gc "github.com/micro/micro/v3/service/client/grpc"
-	"github.com/micro/micro/v3/service/options"
 	gs "github.com/micro/micro/v3/service/server/grpc"
 	"github.com/rs/zerolog/log"
 
@@ -16,7 +15,7 @@ func WithTLS() options.Option {
 			log.Panic().Err(err).Msg("unable to load certs")
 		} else {
 			log.Info().Msg("TLS Enabled")
-			return func(o *micro.Options) {
+			return func(o *options.Options) {
 				o.Client.Init(
 					gc.AuthTLS(tlsConf),
 				)

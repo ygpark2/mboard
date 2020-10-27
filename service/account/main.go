@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/micro/micro/v3/client"
-	"github.com/micro/micro/v3/server"
 	"github.com/micro/micro/v3/service"
+	"github.com/micro/micro/v3/service/client"
+	"github.com/micro/micro/v3/service/server"
 	"github.com/rs/zerolog/log"
 
 	"github.com/ygpark2/mboard/service/account/handler"
@@ -14,7 +14,7 @@ import (
 	greeterPB "github.com/ygpark2/mboard/service/greeter/proto/greeter"
 	"github.com/ygpark2/mboard/shared/config"
 	"github.com/ygpark2/mboard/shared/constants"
-	myMicro "github.com/ygpark2/mboard/shared/util/micro"
+	// myMicro "github.com/ygpark2/mboard/shared/util/micro"
 	logWrapper "github.com/ygpark2/mboard/shared/wrapper/log"
 	transWrapper "github.com/ygpark2/mboard/shared/wrapper/transaction"
 	validatorWrapper "github.com/ygpark2/mboard/shared/wrapper/validator"
@@ -48,7 +48,7 @@ func main() {
 	srv := service.NewService(
 		service.Name(constants.ACCOUNT_SERVICE),
 		service.Version(config.Version),
-		myMicro.WithTLS(),
+		// myMicro.WithTLS(),
 		// Wrappers are applied in reverse order so the last is executed first.
 		service.WrapClient(clientWrappers...),
 		// Adding some optional lifecycle actions

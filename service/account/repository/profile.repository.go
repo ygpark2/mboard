@@ -12,7 +12,7 @@ import (
 // ProfileRepository interface
 type ProfileRepository interface {
 	Exist(model *account_entities.ProfileORM) bool
-	List(limit, page uint32, sort string, model *account_entities.ProfileORM) (total uint32, profiles []*account_entities.ProfileORM, err error)
+	List(limit, page uint32, sort string, model *account_entities.ProfileORM) (total int64, profiles []*account_entities.ProfileORM, err error)
 	Get(id string) (*account_entities.ProfileORM, error)
 	GetByUserID(userId string) (*account_entities.ProfileORM, error)
 	Create(model *account_entities.ProfileORM) error
@@ -32,7 +32,7 @@ func NewProfileRepository(db *gorm.DB) ProfileRepository {
 
 // Exist
 func (repo *profileRepository) Exist(model *account_entities.ProfileORM) bool {
-	var count int
+	var count int64
 	userID := model.UserId
 	if userID != nil && len(*userID) > 0 {
 		repo.db.Model(&account_entities.ProfileORM{}).Where("user_id = ?", *userID).Count(&count)
@@ -44,7 +44,7 @@ func (repo *profileRepository) Exist(model *account_entities.ProfileORM) bool {
 }
 
 // List
-func (repo *profileRepository) List(limit, page uint32, sort string, model *account_entities.ProfileORM) (total uint32, profiles []*account_entities.ProfileORM, err error) {
+func (repo *profileRepository) List(limit, page uint32, sort string, model *account_entities.ProfileORM) (total int64, profiles []*account_entities.ProfileORM, err error) {
 	db := repo.db
 
 	if limit == 0 {
@@ -71,7 +71,7 @@ func (repo *profileRepository) List(limit, page uint32, sort string, model *acco
 		db = db.Where("gender = ?", model.Gender)
 	}
 
-	if err = db.Order(sort).Limit(limit).Offset(offset).Find(&profiles).Count(&total).Error; err != nil {
+	if err = db.Order(sort).Limit(int(limit)).Offset(int(offset)).Find(&profiles).Count(&total).Error; err != nil {
 		// log.Error().Err(err).Msg("Error in ProfileRepository.List")
 		logger.Error("Error in ProfileRepository.List")
 		return

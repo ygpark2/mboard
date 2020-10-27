@@ -7,7 +7,7 @@ option java_multiple_files = true;
 option java_package = "mkit.service.recorder.v1";
 
 import "google/protobuf/empty.proto";
-import "third_party/proto/validate/validate.proto";
+import "validate/validate.proto";
 
 service TransactionService {
     rpc Read (ReadRequest) returns (TransactionEvent);

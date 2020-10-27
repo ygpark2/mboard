@@ -7,6 +7,7 @@ import (
 	// "github.com/micro/micro/v3"
 	"github.com/micro/micro/v3/service/auth"
 	"github.com/micro/micro/v3/service/errors"
+	"github.com/micro/micro/v3/service/events"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thoas/go-funk"
@@ -22,12 +23,12 @@ import (
 // UserHandler struct
 type userHandler struct {
 	userRepository   repository.UserRepository
-	Event            micro.Event
+	Event            events.Event
 	greeterSrvClient greeterPB.GreeterService
 }
 
 // NewUserHandler returns an instance of `UserServiceHandler`.
-func NewUserHandler(repo repository.UserRepository, eve micro.Event, greeterClient greeterPB.GreeterService) userPB.UserServiceHandler {
+func NewUserHandler(repo repository.UserRepository, eve events.Event, greeterClient greeterPB.GreeterService) userPB.UserServiceHandler {
 	return &userHandler{
 		userRepository:   repo,
 		Event:            eve,
@@ -116,7 +117,7 @@ func (h *userHandler) Create(ctx context.Context, req *userPB.CreateRequest, rsp
 	}
 
 	// send email (TODO: async `go h.Event.Publish(...)`)
-	if err := h.Event.Publish(ctx, &emailerPB.Message{To: req.Email.GetValue()}); err != nil {
+	if err := events.Publish(ctx, &emailerPB.Message{To: req.Email.GetValue()}); err != nil {
 		log.Error().Err(err).Msg("Received Event.Publish request error")
 		return myErrors.AppError(myErrors.PSE, err)
 	}

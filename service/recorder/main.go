@@ -9,7 +9,7 @@ import (
 	"github.com/ygpark2/mboard/service/recorder/registry"
 	"github.com/ygpark2/mboard/shared/config"
 	"github.com/ygpark2/mboard/shared/constants"
-	myMicro "github.com/ygpark2/mboard/shared/util/micro"
+	// myMicro "github.com/ygpark2/mboard/shared/util/micro"
 	logWrapper "github.com/ygpark2/mboard/shared/wrapper/log"
 	validatorWrapper "github.com/ygpark2/mboard/shared/wrapper/validator"
 )
@@ -36,7 +36,7 @@ func main() {
 	srv := service.NewService(
 		service.Name(constants.RECORDER_SERVICE),
 		service.Version(config.Version),
-		myMicro.WithTLS(),
+		// myMicro.WithTLS(),
 		// Wrappers are applied in reverse order so the last is executed first.
 		service.WrapClient(clientWrappers...),
 		service.WrapHandler(handlerWrappers...),
