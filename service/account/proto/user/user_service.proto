@@ -8,7 +8,7 @@ option java_package = "mkit.service.account.user.v1";
 
 import "google/protobuf/wrappers.proto";
 // import "shared/proto/common/common.proto";
-import "service/account/proto/entities/entities.proto";
+import "proto/entities/entities.proto";
 import "validate/validate.proto";
 
 // Ref:

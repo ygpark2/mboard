@@ -21,15 +21,15 @@ import (
 // UserHandler struct
 type userHandler struct {
 	userRepository   repository.UserRepository
-	Event            service.Event
+	event            *service.Event
 	greeterSrvClient greeterPB.GreeterService
 }
 
 // NewUserHandler returns an instance of `UserServiceHandler`.
-func NewUserHandler(repo repository.UserRepository, eve service.Event, greeterClient greeterPB.GreeterService) userPB.UserServiceHandler {
+func NewUserHandler(repo repository.UserRepository, eve *service.Event, greeterClient greeterPB.GreeterService) userPB.UserServiceHandler {
 	return &userHandler{
 		userRepository:   repo,
-		Event:            eve,
+		event:            eve,
 		greeterSrvClient: greeterClient,
 	}
 }

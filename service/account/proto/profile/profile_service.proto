@@ -9,7 +9,7 @@ option java_package = "mkit.service.account.profile.v1";
 import "google/protobuf/timestamp.proto";
 // import "shared/proto/common/common.proto";
 import "google/protobuf/wrappers.proto";
-import "service/account/proto/entities/entities.proto";
+import "proto/entities/entities.proto";
 import "validate/validate.proto";
 
 service ProfileService {

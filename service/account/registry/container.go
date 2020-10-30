@@ -1,8 +1,8 @@
 package registry
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/sarulabs/di/v2"
-	"gorm.io/gorm"
 
 	"github.com/rs/zerolog/log"
 
@@ -58,7 +58,7 @@ func NewContainer(cfg configPB.Configuration) (*Container, error) {
 				// Publisher publish to "mkit.service.emailer"
 				publisher := service.NewEvent(constants.EMAILER_SERVICE)
 				// greeterSrv Client to call "mkit.service.greeter"
-				greeterSrvClient := greeterPB.NewGreeterService(constants.GREETER_SERVICE, client.Client.Init())
+				greeterSrvClient := greeterPB.NewGreeterService(constants.GREETER_SERVICE, client.DefaultClient)
 				return handler.NewUserHandler(repo, publisher, greeterSrvClient), nil // FIXME inject Publisher, and greeter service
 			},
 		},
