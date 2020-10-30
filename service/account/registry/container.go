@@ -1,16 +1,21 @@
 package registry
 
 import (
-	"github.com/jinzhu/gorm"
 	"github.com/sarulabs/di/v2"
+	"gorm.io/gorm"
 
 	"github.com/rs/zerolog/log"
 
+	"github.com/micro/micro/v3/service"
+	"github.com/micro/micro/v3/service/client"
 	"github.com/ygpark2/mboard/service/account/handler"
+
+	"github.com/xmlking/micro-starter-kit/shared/constants"
+	"github.com/xmlking/micro-starter-kit/shared/database"
+	configPB "github.com/xmlking/micro-starter-kit/shared/proto/config"
 	account_entities "github.com/ygpark2/mboard/service/account/proto/entities"
 	"github.com/ygpark2/mboard/service/account/repository"
-	"github.com/ygpark2/mboard/shared/database"
-	configPB "github.com/ygpark2/mboard/shared/proto/config"
+	greeterPB "github.com/ygpark2/mboard/service/greeter/proto/greeter"
 )
 
 // Container - provide di Container
@@ -47,7 +52,15 @@ func NewContainer(cfg configPB.Configuration) (*Container, error) {
 		{
 			Name:  "user-handler",
 			Scope: di.App,
-			Build: buildUserHandler,
+			Build: func(ctn di.Container) (interface{}, error) {
+				repo := ctn.Get("user-repository").(repository.UserRepository)
+
+				// Publisher publish to "mkit.service.emailer"
+				publisher := service.NewEvent(constants.EMAILER_SERVICE)
+				// greeterSrv Client to call "mkit.service.greeter"
+				greeterSrvClient := greeterPB.NewGreeterService(constants.GREETER_SERVICE, client.Client.Init())
+				return handler.NewUserHandler(repo, publisher, greeterSrvClient), nil // FIXME inject Publisher, and greeter service
+			},
 		},
 		{
 			Name:  "profile-handler",
@@ -66,7 +79,7 @@ func NewContainer(cfg configPB.Configuration) (*Container, error) {
 				return database.GetDatabaseConnection(*cfg.Database)
 			},
 			Close: func(obj interface{}) error {
-				return obj.(*gorm.DB).Close()
+				return nil // obj.(*gorm.DB).Close()
 			},
 		},
 	}...); err != nil {
@@ -103,9 +116,4 @@ func buildProfileRepository(ctn di.Container) (interface{}, error) {
 	db := ctn.Get("database").(*gorm.DB)
 	db.AutoMigrate(&account_entities.ProfileORM{})
 	return repository.NewProfileRepository(db), nil
-}
-
-func buildUserHandler(ctn di.Container) (interface{}, error) {
-	repo := ctn.Get("user-repository").(repository.UserRepository)
-	return handler.NewUserHandler(repo, nil, nil), nil // FIXME inject Publisher, and greeter service
 }

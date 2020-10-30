@@ -45,8 +45,8 @@ message ExistResponse {
 }
 
 message ListRequest {
-    google.protobuf.UInt32Value limit = 1 [(validate.rules).uint32 = { gte: 1 lte: 100 }];
-    google.protobuf.UInt32Value page = 2 [(validate.rules).uint32.gte = 1];
+    google.protobuf.Int32Value limit = 1 [(validate.rules).int32 = { gte: 1 lte: 100 }];
+    google.protobuf.Int32Value page = 2 [(validate.rules).int32.gte = 1];
     google.protobuf.StringValue sort = 3;
     google.protobuf.StringValue username = 4 [(validate.rules).string = {
     min_len: 4
@@ -62,7 +62,7 @@ message ListRequest {
 message ListResponse {
     option (validate.disabled) = true;
     repeated mkit.service.account.entities.v1.User results = 1;
-    uint32 total = 2;
+    int64 total = 2;
 }
 
 message GetRequest {

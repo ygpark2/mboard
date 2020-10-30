@@ -4,10 +4,9 @@ import (
 	"context"
 
 	"github.com/jinzhu/gorm"
-	// "github.com/micro/micro/v3"
+	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/auth"
 	"github.com/micro/micro/v3/service/errors"
-	"github.com/micro/micro/v3/service/events"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thoas/go-funk"
@@ -15,7 +14,6 @@ import (
 	account_entities "github.com/ygpark2/mboard/service/account/proto/entities"
 	userPB "github.com/ygpark2/mboard/service/account/proto/user"
 	"github.com/ygpark2/mboard/service/account/repository"
-	emailerPB "github.com/ygpark2/mboard/service/emailer/proto/emailer"
 	greeterPB "github.com/ygpark2/mboard/service/greeter/proto/greeter"
 	myErrors "github.com/ygpark2/mboard/shared/errors"
 )
@@ -23,12 +21,12 @@ import (
 // UserHandler struct
 type userHandler struct {
 	userRepository   repository.UserRepository
-	Event            events.Event
+	Event            service.Event
 	greeterSrvClient greeterPB.GreeterService
 }
 
 // NewUserHandler returns an instance of `UserServiceHandler`.
-func NewUserHandler(repo repository.UserRepository, eve events.Event, greeterClient greeterPB.GreeterService) userPB.UserServiceHandler {
+func NewUserHandler(repo repository.UserRepository, eve service.Event, greeterClient greeterPB.GreeterService) userPB.UserServiceHandler {
 	return &userHandler{
 		userRepository:   repo,
 		Event:            eve,
@@ -59,7 +57,7 @@ func (h *userHandler) List(ctx context.Context, req *userPB.ListRequest, rsp *us
 	model.LastName = req.LastName.GetValue()
 	model.Email = req.Email.GetValue()
 
-	total, users, err := h.userRepository.List(req.Limit.GetValue(), req.Page.GetValue(), req.Sort.GetValue(), &model)
+	total, users, err := h.userRepository.List(int(req.Limit.GetValue()), int(req.Page.GetValue()), req.Sort.GetValue(), &model)
 	if err != nil {
 		return errors.NotFound("mkit.service.account.user.list", "Error %v", err.Error())
 	}
@@ -117,10 +115,12 @@ func (h *userHandler) Create(ctx context.Context, req *userPB.CreateRequest, rsp
 	}
 
 	// send email (TODO: async `go h.Event.Publish(...)`)
-	if err := events.Publish(ctx, &emailerPB.Message{To: req.Email.GetValue()}); err != nil {
-		log.Error().Err(err).Msg("Received Event.Publish request error")
-		return myErrors.AppError(myErrors.PSE, err)
-	}
+	/*
+		if err := events.Publish(ctx, &emailerPB.Message{To: req.Email.GetValue()}); err != nil {
+			log.Error().Err(err).Msg("Received Event.Publish request error")
+			return myErrors.AppError(myErrors.PSE, err)
+		}
+	*/
 
 	// call greeter
 	// if res, err := h.greeterSrvClient.Hello(ctx, &greeterPB.Request{Name: req.GetFirstName().GetValue()}); err != nil {

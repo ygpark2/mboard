@@ -1,23 +1,18 @@
 package main
 
 import (
-	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/client"
 	"github.com/micro/micro/v3/service/server"
 	"github.com/rs/zerolog/log"
 
+	"github.com/xmlking/micro-starter-kit/shared/config"
+	"github.com/xmlking/micro-starter-kit/shared/constants"
+	logWrapper "github.com/xmlking/micro-starter-kit/shared/wrapper/log"
+	transWrapper "github.com/xmlking/micro-starter-kit/shared/wrapper/transaction"
+	validatorWrapper "github.com/xmlking/micro-starter-kit/shared/wrapper/validator"
 	"github.com/ygpark2/mboard/service/account/handler"
-	profilePB "github.com/ygpark2/mboard/service/account/proto/profile"
-	userPB "github.com/ygpark2/mboard/service/account/proto/user"
 	"github.com/ygpark2/mboard/service/account/registry"
 	"github.com/ygpark2/mboard/service/account/repository"
-	greeterPB "github.com/ygpark2/mboard/service/greeter/proto/greeter"
-	"github.com/ygpark2/mboard/shared/config"
-	"github.com/ygpark2/mboard/shared/constants"
-	// myMicro "github.com/ygpark2/mboard/shared/util/micro"
-	logWrapper "github.com/ygpark2/mboard/shared/wrapper/log"
-	transWrapper "github.com/ygpark2/mboard/shared/wrapper/transaction"
-	validatorWrapper "github.com/ygpark2/mboard/shared/wrapper/validator"
 )
 
 func main() {
@@ -80,11 +75,6 @@ func main() {
 	if err != nil {
 		log.Fatal().Msgf("failed to build container: %v", err)
 	}
-
-	// Publisher publish to "mkit.service.emailer"
-	publisher := service.NewEvent(constants.EMAILER_SERVICE, service.Client())
-	// greeterSrv Client to call "mkit.service.greeter"
-	greeterSrvClient := greeterPB.NewGreeterService(constants.GREETER_SERVICE, service.Client())
 
 	// // Handlers
 	userHandler := handler.NewUserHandler(ctn.Resolve("user-repository").(repository.UserRepository), publisher, greeterSrvClient)
