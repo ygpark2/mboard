@@ -21,7 +21,7 @@ proto:
 .PHONY: build
 build: proto
 
-	go build -o account-service *.go
+	go build -mod=vendor -o account-service *.go
 
 .PHONY: test
 test:

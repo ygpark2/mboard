@@ -51,3 +51,14 @@ micro call mkit.service.account UserService.Create \
 '{"username": "sumo1", "firstName": "sumo1", "lastName": "demo1", "email": "sumo1@demo.com"}'
 micro call mkit.service.account UserService.List '{}'
 ```
+
+## For etcd version mismatch fix
+
+go mod download
+go mod vendor
+cd vendor/github.com/coreos/etcd/
+curl -Ls https://github.com/etcd-io/etcd/pull/11580.patch | patch -p1
+
+cd vendor/github.com/coreos/etcd/
+curl -Ls https://github.com/corpix/etcd/commit/adb7dcade831f698e657bf1ccab6c138be05fb84.patch | patch -p1
+

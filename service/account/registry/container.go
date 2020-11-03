@@ -10,12 +10,12 @@ import (
 	"github.com/micro/micro/v3/service/client"
 	"github.com/ygpark2/mboard/service/account/handler"
 
-	"github.com/xmlking/micro-starter-kit/shared/constants"
-	"github.com/xmlking/micro-starter-kit/shared/database"
-	configPB "github.com/xmlking/micro-starter-kit/shared/proto/config"
 	account_entities "github.com/ygpark2/mboard/service/account/proto/entities"
 	"github.com/ygpark2/mboard/service/account/repository"
 	greeterPB "github.com/ygpark2/mboard/service/greeter/proto/greeter"
+	"github.com/ygpark2/mboard/shared/constants"
+	"github.com/ygpark2/mboard/shared/database"
+	configPB "github.com/ygpark2/mboard/shared/proto/config"
 )
 
 // Container - provide di Container
