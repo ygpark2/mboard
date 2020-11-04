@@ -26,7 +26,8 @@ require (
 	github.com/xanzy/go-gitlab v0.39.0 // indirect
 	github.com/xmlking/micro-starter-kit v0.3.7
 	github.com/ygpark2/mboard v0.0.0-20201030010300-0a58f2994974
-	github.com/ygpark2/mboard/service/greeter v0.0.0-20201030051620-33d7831905d0
+	github.com/ygpark2/mboard/service/greeter v0.0.0-20201103090146-2c7cb3e5d3fa
+	// github.com/ygpark2/mboard/service/greeter v0.0.0-20201030051620-33d7831905d0
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
 	golang.org/x/net v0.0.0-20201031054903-ff519b6c9102 // indirect
 	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
