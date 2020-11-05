@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"
-	"github.com/ygpark2/mboard/services/board/search/handler"
+	"github.com/ygpark2/mboard/service/board/search/handler"
 )
 
 func main() {
