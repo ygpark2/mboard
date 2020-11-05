@@ -24,10 +24,6 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/thoas/go-funk v0.7.0
 	github.com/xmlking/micro-starter-kit v0.3.7
-	github.com/ygpark2/mboard/shared v0.0.0-20201104020547-99881663cfa3
-	// github.com/ygpark2/mboard/shared v0.0.0-20201104020547-99881663cfa3
-	// github.com/ygpark2/mboard/shared v0.0.1
-	// github.com/ygpark2/mboard/shared v0.0.0-20201105013738-aa04de279772
 	golang.org/x/net v0.0.0-20201010224723-4f7140c49acb // indirect
 	google.golang.org/genproto v0.0.0-20201001141541-efaab9d3c4f7
 	google.golang.org/grpc v1.33.1
