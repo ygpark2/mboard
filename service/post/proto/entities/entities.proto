@@ -12,7 +12,6 @@ import "google/protobuf/wrappers.proto";
 import "options/gorm.proto";
 import "types/types.proto";
 import "validate/validate.proto";
-import "service/board/proto/entities/entities.proto";
 
 // Post Entity
 message Post {
@@ -37,5 +36,4 @@ message Post {
     string content = 8 [(gorm.field).tag = { not_null: true }];
     string email = 9 [(gorm.field).tag = { not_null: true }];
     string writer = 10 [(gorm.field).tag = { not_null: true }];
-    mkit.service.board.entities.v1.Board board = 11 [(gorm.field).belongs_to = { preload: true }];
 }

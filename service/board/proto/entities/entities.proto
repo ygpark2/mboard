@@ -37,7 +37,8 @@ message Board {
     google.protobuf.StringValue supervisor = 8 [(gorm.field).tag = { size: 100 not_null: true }];
     google.protobuf.StringValue moderator = 9 [(gorm.field).tag = { size: 100 not_null: true }];
     string description = 10 [(gorm.field).tag = { not_null: true }];
-    repeated mkit.service.post.entities.v1.Post notices = 11 [(gorm.field).has_many = {preload: false}];
+    repeated mkit.service.post.entities.v1.Post notices = 11 [(gorm.field).has_many = {preload: true}];
     string email = 12 [(gorm.field).tag = { not_null: true }];
     uint32 total_posts = 13 [(gorm.field).drop = true];
+    repeated mkit.service.post.entities.v1.Post posts = 14 [(gorm.field).has_many = {preload: true}];
 }
