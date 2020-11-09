@@ -11,7 +11,7 @@ import (
 	"github.com/ygpark2/mboard/shared/config"
 	// myMicro "github.com/ygpark2/mboard/shared/util/micro"
 	logWrapper "github.com/ygpark2/mboard/shared/wrapper/log"
-	transWrapper "github.com/ygpark2/mboard/shared/wrapper/transaction"
+	// transWrapper "github.com/ygpark2/mboard/shared/wrapper/transaction"
 	validatorWrapper "github.com/ygpark2/mboard/shared/wrapper/validator"
 )
 
@@ -58,10 +58,12 @@ func main() {
 	)
 
 	if cfg.Features.Translogs.Enabled {
+		/*
 		topic := cfg.Features.Translogs.Topic
 		publisher := service.NewEvent(topic, service.Client())
 		handlerWrappers = append(handlerWrappers, transWrapper.NewHandlerWrapper(publisher))
 		subscriberWrappers = append(subscriberWrappers, transWrapper.NewSubscriberWrapper(publisher))
+		*/
 	}
 
 	service.Init(

@@ -1,21 +1,21 @@
 syntax = "proto3";
 
-package mkit.service.account.user.v1;
+package mkit.service.account.board.v1;
 
-option go_package = "github.com/ygpark2/mboard/service/account/proto/user";
+option go_package = "github.com/ygpark2/mboard/service/board/proto/board";
 option java_multiple_files = true;
-option java_package = "mkit.service.account.user.v1";
+option java_package = "mkit.service.account.board.v1";
 
 import "google/protobuf/wrappers.proto";
 // import "shared/proto/common/common.proto";
-import "service/account/proto/entities/entities.proto";
+import "service/board/proto/entities/entities.proto";
 import "validate/validate.proto";
 
 // Ref:
 // https://github.com/seizadi/atlas-template/blob/master/resolved/pkg/pb/cmdb.proto
 
-// User Service
-service UserService {
+// Board Service
+service BoardService {
     rpc Exist (ExistRequest) returns (ExistResponse);
     rpc List (ListRequest) returns (ListResponse);
     rpc Get (GetRequest) returns (GetResponse);
@@ -61,7 +61,7 @@ message ListRequest {
 
 message ListResponse {
     option (validate.disabled) = true;
-    repeated mkit.service.account.entities.v1.User results = 1;
+    repeated mkit.service.board.entities.v1.Board results = 1;
     int64 total = 2;
 }
 
@@ -80,7 +80,7 @@ message GetRequest {
 
 message GetResponse {
     option (validate.disabled) = true;
-    mkit.service.account.entities.v1.User result = 1;
+    mkit.service.board.entities.v1.Board result = 1;
     // basic.Error error =2;
 }
 
@@ -98,7 +98,7 @@ message CreateRequest {
 
 message CreateResponse {
     option (validate.disabled) = true;
-    mkit.service.account.entities.v1.User result = 1;
+    mkit.service.board.entities.v1.Board result = 1;
 }
 
 message UpdateRequest {
@@ -116,7 +116,7 @@ message UpdateRequest {
 
 message UpdateResponse {
     option (validate.disabled) = true;
-    mkit.service.account.entities.v1.User result = 1;
+    mkit.service.board.entities.v1.Board result = 1;
 }
 
 message DeleteRequest {
@@ -134,5 +134,5 @@ message DeleteRequest {
 
 message DeleteResponse {
     option (validate.disabled) = true;
-    mkit.service.account.entities.v1.User result = 1;
+    mkit.service.board.entities.v1.Board result = 1;
 }
