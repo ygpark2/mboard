@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
+	github.com/bufbuild/buf v0.30.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.3.0
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3
@@ -20,10 +21,12 @@ require (
 	github.com/micro/services v0.14.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.20.0
+	github.com/rvflash/goup v0.4.1 // indirect
 	github.com/sarulabs/di/v2 v2.4.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/stretchr/testify v1.6.1
 	github.com/thoas/go-funk v0.7.0
+	github.com/uber/prototool v1.10.1-0.20200519182255-a6d064684c01 // indirect
 	github.com/xmlking/configor v0.1.0
 	github.com/xmlking/micro-starter-kit v0.3.7
 	golang.org/x/crypto v0.0.0-20201016220609-9e8e0b390897 // indirect
@@ -31,8 +34,11 @@ require (
 	golang.org/x/sys v0.0.0-20201101102859-da207088b7d1 // indirect
 	google.golang.org/genproto v0.0.0-20201103154000-415bd0cd5df6
 	google.golang.org/grpc v1.32.0
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.0.1 // indirect
 	google.golang.org/grpc/examples v0.0.0-20201106192519-9c2f82d9a79c // indirect
 	google.golang.org/protobuf v1.25.0
+	sigs.k8s.io/kind v0.9.0 // indirect
+	sigs.k8s.io/kustomize/kustomize/v3 v3.3.0 // indirect
 )
 
 // exclude github.com/ygpark2/mboard v0.0.0-20201103090146-2c7cb3e5d3fa
