@@ -13,6 +13,7 @@ import "options/gorm.proto";
 import "types/types.proto";
 import "validate/validate.proto";
 
+
 // Post Entity
 message Post {
     option (validate.disabled) = true;
@@ -26,14 +27,21 @@ message Post {
     gorm.types.UUID id = 1 [(gorm.field).tag = {
     type: "uuid"
     not_null: true
-    unique: true
+    unique: true 
     primary_key: true
   }]; // primary key
     google.protobuf.Timestamp created_at = 2 [(gorm.field).tag = { not_null: true }];
     google.protobuf.Timestamp updated_at = 3 [(gorm.field).tag = { not_null: true }];
-    google.protobuf.Timestamp deleted_at = 4 [(gorm.field).tag = { index: "idx_users_deleted_at" }];
-    google.protobuf.StringValue title = 7 [(gorm.field).tag = { not_null: true }];
-    string content = 8 [(gorm.field).tag = { not_null: true }];
-    string email = 9 [(gorm.field).tag = { not_null: true }];
-    string writer = 10 [(gorm.field).tag = { not_null: true }];
+    google.protobuf.Timestamp deleted_at = 4 [(gorm.field).tag = { index: "idx_posts_deleted_at" }];
+    google.protobuf.StringValue board_id = 5 [(gorm.field).tag = { index: "idx_posts_board", not_null: true }];
+    google.protobuf.StringValue title = 6 [(gorm.field).tag = { not_null: true }];
+    google.protobuf.StringValue category = 7 [(gorm.field).tag = { not_null: true }];
+    google.protobuf.StringValue password = 8 [(gorm.field).tag = { not_null: false }];
+    string content = 9 [(gorm.field).tag = { not_null: true }];
+    string email = 10 [(gorm.field).tag = { not_null: true }];
+    string writer = 11 [(gorm.field).tag = { not_null: true }];
+    uint32 comment_counts = 12 [(gorm.field).drop = true];
+    uint32 read_counts = 13 [(gorm.field).drop = true];
+    uint32 up_vote_counts = 14 [(gorm.field).drop = true];
+    uint32 down_vote_counts = 15 [(gorm.field).drop = true];
 }

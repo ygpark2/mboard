@@ -1,1 +1,1 @@
-service posts
+service post

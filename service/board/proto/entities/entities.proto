@@ -12,7 +12,6 @@ import "google/protobuf/wrappers.proto";
 import "options/gorm.proto";
 import "types/types.proto";
 import "validate/validate.proto";
-import "service/post/proto/entities/entities.proto";
 
 // Board Entity
 message Board {
@@ -37,8 +36,8 @@ message Board {
     google.protobuf.StringValue supervisor = 8 [(gorm.field).tag = { size: 100 not_null: true }];
     google.protobuf.StringValue moderator = 9 [(gorm.field).tag = { size: 100 not_null: true }];
     string description = 10 [(gorm.field).tag = { not_null: true }];
-    repeated mkit.service.post.entities.v1.Post notices = 11 [(gorm.field).has_many = {preload: true}];
+    repeated string notices = 11 [(gorm.field).tag = { not_null: false }];
     string email = 12 [(gorm.field).tag = { not_null: true }];
     uint32 total_posts = 13 [(gorm.field).drop = true];
-    repeated mkit.service.post.entities.v1.Post posts = 14 [(gorm.field).has_many = {preload: true}];
+    uint64 total_comments = 14 [(gorm.field).drop = true];
 }
