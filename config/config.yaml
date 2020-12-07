@@ -22,7 +22,7 @@ services:
     version: v0.1.0
   greeter:
     endpoint: dns:///greeter.test:8081
-#    endpoint: unix:///tmp/greeter.sock
+    # endpoint: unix:///tmp/greeter.sock
     version: v0.1.0
   emailer:
     endpoint: dns:///emailer.test:8082
