@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/micro/micro/v3/service/logger"
-	pb "github.com/micro/services/content/proto"
+	pb "github.com/ygpark2/mboard/service/content/proto"
 )
 
 type Contents struct{}

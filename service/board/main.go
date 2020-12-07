@@ -10,13 +10,16 @@ import (
 func main() {
 	// Create the service
 	srv := service.New(
-		service.Name("posts"),
+		service.Name("boards"),
 	)
 
 	// Register Handler
+	srv.Handle(&handler.BoardService())
+	/*
 	srv.Handle(&handler.Posts{
 		Tags: tags.NewTagsService("tags", srv.Client()),
 	})
+	*/
 
 	// Run service
 	if err := srv.Run(); err != nil {
