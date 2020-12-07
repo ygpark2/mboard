@@ -4,6 +4,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
+	"github.com/micro/micro/v3/service/logger"
 	uuid "github.com/satori/go.uuid"
 
 	board_entities "github.com/ygpark2/mboard/service/board/proto/entities"
@@ -33,7 +34,7 @@ func NewBoardRepository(db *gorm.DB) BoardRepository {
 
 // Exist
 func (repo *boardRepository) Exist(model *board_entities.BoardORM) bool {
-	log.Info().Msgf("Received boardRepository.Exist request %v", *model)
+	logger.Infof("Received boardRepository.Exist request %v", *model)
 	var count int64
 	if model.Username != nil && len(*model.Username) > 0 {
 		repo.db.Model(&board_entities.BoardORM{}).Where("username = ?", model.Username).Count(&count)
@@ -87,7 +88,7 @@ func (repo *boardRepository) List(limit, page int, sort string, model *board_ent
 	}
 	// enable auto preloading for `Profile`
 	if err = db.Set("gorm:auto_preload", true).Order(sort).Limit(limit).Offset(offset).Find(&users).Count(&total).Error; err != nil {
-		log.Error().Err(err).Msg("Error in boardRepository.List")
+		logger.WithError(err).Error("Error in boardRepository.List")
 		return
 	}
 	return
@@ -102,7 +103,7 @@ func (repo *boardRepository) Get(id string) (user *board_entities.BoardORM, err 
 	user = &board_entities.BoardORM{Id: u2}
 	// enable auto preloading for `Profile`
 	if err = repo.db.Set("gorm:auto_preload", true).First(user).Error; err != nil && err != gorm.ErrRecordNotFound {
-		log.Error().Err(err).Msg("Error in boardRepository.Get")
+		logger.WithError(err).Error("Error in boardRepository.Get")
 	}
 	return
 }
@@ -114,7 +115,7 @@ func (repo *boardRepository) Create(model *board_entities.BoardORM) error {
 	}
 	// if err := repo.db.Set("gorm:association_autoupdate", false).Create(model).Error; err != nil {
 	if err := repo.db.Create(model).Error; err != nil {
-		log.Error().Err(err).Msg("Error in boardRepository.Create")
+		logger.WithError(err).Error("Error in boardRepository.Create")
 		return err
 	}
 	return nil
@@ -132,11 +133,11 @@ func (repo *boardRepository) Update(id string, model *board_entities.BoardORM) e
 	// result := repo.db.Set("gorm:association_autoupdate", false).Save(model)
 	result := repo.db.Model(user).Updates(model)
 	if err := result.Error; err != nil {
-		log.Error().Err(err).Msg("Error in boardRepository.Update")
+		logger.WithError(err).Error("Error in boardRepository.Update")
 		return err
 	}
 	if rowsAffected := result.RowsAffected; rowsAffected == 0 {
-		log.Error().Msgf("Error in boardRepository.Update, rowsAffected: %v", rowsAffected)
+		logger.Errorf("Error in boardRepository.Update, rowsAffected: %v", rowsAffected)
 		return errors.New("no records updated, No match was found")
 	}
 	return nil
@@ -146,11 +147,11 @@ func (repo *boardRepository) Update(id string, model *board_entities.BoardORM) e
 func (repo *boardRepository) Delete(model *board_entities.BoardORM) error {
 	result := repo.db.Delete(model)
 	if err := result.Error; err != nil {
-		log.Error().Err(err).Msg("Error in boardRepository.Delete")
+		logger.WithError(err).Error("Error in boardRepository.Delete")
 		return err
 	}
 	if rowsAffected := result.RowsAffected; rowsAffected == 0 {
-		log.Error().Msgf("Error in boardRepository.Delete, rowsAffected: %v", rowsAffected)
+		logger.Errorf("Error in boardRepository.Delete, rowsAffected: %v", rowsAffected)
 		return errors.New("no records deleted, No match was found")
 	}
 	return nil

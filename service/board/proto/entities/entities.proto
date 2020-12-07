@@ -33,11 +33,11 @@ message Board {
     google.protobuf.Timestamp updated_at = 3 [(gorm.field).tag = { not_null: true }];
     google.protobuf.Timestamp deleted_at = 4 [(gorm.field).tag = { index: "idx_boards_deleted_at" }];
     google.protobuf.StringValue title = 7 [(gorm.field).tag = { size: 255 not_null: true }];
-    google.protobuf.StringValue supervisor = 8 [(gorm.field).tag = { size: 100 not_null: true }];
-    google.protobuf.StringValue moderator = 9 [(gorm.field).tag = { size: 100 not_null: true }];
-    string description = 10 [(gorm.field).tag = { not_null: true }];
-    repeated string notices = 11 [(gorm.field).tag = { not_null: false }];
-    string email = 12 [(gorm.field).tag = { not_null: true }];
+    google.protobuf.StringValue mobile_title = 8 [(gorm.field).tag = { size: 255 not_null: true }];
+    google.protobuf.UInt32Value order = 9 [(gorm.field).tag = { not_null: true }];
+    google.protobuf.BoolValue search = 10 [(gorm.field).tag = { not_null: true }];
+    string description = 11 [(gorm.field).tag = { not_null: true }];
+    repeated string notices = 12 [(gorm.field).tag = { not_null: false }];
     uint32 total_posts = 13 [(gorm.field).drop = true];
     uint64 total_comments = 14 [(gorm.field).drop = true];
 }

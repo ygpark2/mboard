@@ -56,116 +56,78 @@ func (m *ExistRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
-
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
-			return ExistRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return ExistRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_ExistRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return ExistRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
-			}
-		}
-
-	}
-
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ExistRequestValidationError{
-				field:  "FirstName",
+				field:  "Title",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetMobileTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ExistRequestValidationError{
-				field:  "LastName",
+				field:  "MobileTitle",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetEmail(); wrapper != nil {
+	if wrapper := m.GetOrder(); wrapper != nil {
 
-		if err := m._validateEmail(wrapper.GetValue()); err != nil {
+		if val := wrapper.GetValue(); val < 1 || val > 100 {
 			return ExistRequestValidationError{
-				field:  "Email",
-				reason: "value must be a valid email address",
+				field:  "Order",
+				reason: "value must be inside range [1, 100]",
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetSearch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExistRequestValidationError{
+				field:  "Search",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
 	}
 
-	return nil
-}
-
-func (m *ExistRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
+	if utf8.RuneCountInString(m.GetDescription()) < 0 {
+		return ExistRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 0 runes",
+		}
 	}
 
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+	if len(m.GetNotices()) > 5 {
+		return ExistRequestValidationError{
+			field:  "Notices",
+			reason: "value must contain no more than 5 item(s)",
 		}
+	}
 
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
+	if m.GetTotalPosts() < 0 {
+		return ExistRequestValidationError{
+			field:  "TotalPosts",
+			reason: "value must be greater than or equal to 0",
 		}
+	}
 
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
+	if m.GetTotalComments() < 0 {
+		return ExistRequestValidationError{
+			field:  "TotalComments",
+			reason: "value must be greater than or equal to 0",
 		}
 	}
 
 	return nil
-}
-
-func (m *ExistRequest) _validateEmail(addr string) error {
-	a, err := mail.ParseAddress(addr)
-	if err != nil {
-		return err
-	}
-	addr = a.Address
-
-	if len(addr) > 254 {
-		return errors.New("email addresses cannot exceed 254 characters")
-	}
-
-	parts := strings.SplitN(addr, "@", 2)
-
-	if len(parts[0]) > 64 {
-		return errors.New("email address local phrase cannot exceed 64 characters")
-	}
-
-	return m._validateHostname(parts[1])
 }
 
 func (m *ExistRequest) _validateUuid(uuid string) error {
@@ -229,8 +191,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExistRequestValidationError{}
-
-var _ExistRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for ExistResponse. This method will always return nil.
 func (m *ExistResponse) Validate() error {
@@ -331,116 +291,78 @@ func (m *ListRequest) Validate() error {
 		}
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
-
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
-			return ListRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return ListRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_ListRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return ListRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
-			}
-		}
-
-	}
-
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ListRequestValidationError{
-				field:  "FirstName",
+				field:  "Title",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetMobileTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ListRequestValidationError{
-				field:  "LastName",
+				field:  "MobileTitle",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetEmail(); wrapper != nil {
+	if wrapper := m.GetOrder(); wrapper != nil {
 
-		if err := m._validateEmail(wrapper.GetValue()); err != nil {
+		if val := wrapper.GetValue(); val < 1 || val > 100 {
 			return ListRequestValidationError{
-				field:  "Email",
-				reason: "value must be a valid email address",
+				field:  "Order",
+				reason: "value must be inside range [1, 100]",
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetSearch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ListRequestValidationError{
+				field:  "Search",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
 	}
 
-	return nil
-}
-
-func (m *ListRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
+	if utf8.RuneCountInString(m.GetDescription()) < 0 {
+		return ListRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 0 runes",
+		}
 	}
 
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+	if len(m.GetNotices()) > 5 {
+		return ListRequestValidationError{
+			field:  "Notices",
+			reason: "value must contain no more than 5 item(s)",
 		}
+	}
 
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
+	if m.GetTotalPosts() < 0 {
+		return ListRequestValidationError{
+			field:  "TotalPosts",
+			reason: "value must be greater than or equal to 0",
 		}
+	}
 
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
+	if m.GetTotalComments() < 0 {
+		return ListRequestValidationError{
+			field:  "TotalComments",
+			reason: "value must be greater than or equal to 0",
 		}
 	}
 
 	return nil
-}
-
-func (m *ListRequest) _validateEmail(addr string) error {
-	a, err := mail.ParseAddress(addr)
-	if err != nil {
-		return err
-	}
-	addr = a.Address
-
-	if len(addr) > 254 {
-		return errors.New("email addresses cannot exceed 254 characters")
-	}
-
-	parts := strings.SplitN(addr, "@", 2)
-
-	if len(parts[0]) > 64 {
-		return errors.New("email address local phrase cannot exceed 64 characters")
-	}
-
-	return m._validateHostname(parts[1])
 }
 
 // ListRequestValidationError is the validation error returned by
@@ -496,8 +418,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListRequestValidationError{}
-
-var _ListRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for ListResponse. This method will always return nil.
 func (m *ListResponse) Validate() error {
@@ -577,116 +497,78 @@ func (m *GetRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
-
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
-			return GetRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return GetRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_GetRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return GetRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
-			}
-		}
-
-	}
-
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return GetRequestValidationError{
-				field:  "FirstName",
+				field:  "Title",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetMobileTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return GetRequestValidationError{
-				field:  "LastName",
+				field:  "MobileTitle",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetEmail(); wrapper != nil {
+	if wrapper := m.GetOrder(); wrapper != nil {
 
-		if err := m._validateEmail(wrapper.GetValue()); err != nil {
+		if val := wrapper.GetValue(); val < 1 || val > 100 {
 			return GetRequestValidationError{
-				field:  "Email",
-				reason: "value must be a valid email address",
+				field:  "Order",
+				reason: "value must be inside range [1, 100]",
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetSearch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetRequestValidationError{
+				field:  "Search",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
 	}
 
-	return nil
-}
-
-func (m *GetRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
+	if utf8.RuneCountInString(m.GetDescription()) < 0 {
+		return GetRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 0 runes",
+		}
 	}
 
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+	if len(m.GetNotices()) > 5 {
+		return GetRequestValidationError{
+			field:  "Notices",
+			reason: "value must contain no more than 5 item(s)",
 		}
+	}
 
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
+	if m.GetTotalPosts() < 0 {
+		return GetRequestValidationError{
+			field:  "TotalPosts",
+			reason: "value must be greater than or equal to 0",
 		}
+	}
 
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
+	if m.GetTotalComments() < 0 {
+		return GetRequestValidationError{
+			field:  "TotalComments",
+			reason: "value must be greater than or equal to 0",
 		}
 	}
 
 	return nil
-}
-
-func (m *GetRequest) _validateEmail(addr string) error {
-	a, err := mail.ParseAddress(addr)
-	if err != nil {
-		return err
-	}
-	addr = a.Address
-
-	if len(addr) > 254 {
-		return errors.New("email addresses cannot exceed 254 characters")
-	}
-
-	parts := strings.SplitN(addr, "@", 2)
-
-	if len(parts[0]) > 64 {
-		return errors.New("email address local phrase cannot exceed 64 characters")
-	}
-
-	return m._validateHostname(parts[1])
 }
 
 func (m *GetRequest) _validateUuid(uuid string) error {
@@ -750,8 +632,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetRequestValidationError{}
-
-var _GetRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for GetResponse. This method will always return nil.
 func (m *GetResponse) Validate() error {
@@ -820,116 +700,78 @@ func (m *CreateRequest) Validate() error {
 		return nil
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
-
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
-			return CreateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return CreateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_CreateRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return CreateRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
-			}
-		}
-
-	}
-
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return CreateRequestValidationError{
-				field:  "FirstName",
+				field:  "Title",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetMobileTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return CreateRequestValidationError{
-				field:  "LastName",
+				field:  "MobileTitle",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetEmail(); wrapper != nil {
+	if wrapper := m.GetOrder(); wrapper != nil {
 
-		if err := m._validateEmail(wrapper.GetValue()); err != nil {
+		if val := wrapper.GetValue(); val < 1 || val > 100 {
 			return CreateRequestValidationError{
-				field:  "Email",
-				reason: "value must be a valid email address",
+				field:  "Order",
+				reason: "value must be inside range [1, 100]",
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetSearch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CreateRequestValidationError{
+				field:  "Search",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
 	}
 
-	return nil
-}
-
-func (m *CreateRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
+	if utf8.RuneCountInString(m.GetDescription()) < 0 {
+		return CreateRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 0 runes",
+		}
 	}
 
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+	if len(m.GetNotices()) > 5 {
+		return CreateRequestValidationError{
+			field:  "Notices",
+			reason: "value must contain no more than 5 item(s)",
 		}
+	}
 
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
+	if m.GetTotalPosts() < 0 {
+		return CreateRequestValidationError{
+			field:  "TotalPosts",
+			reason: "value must be greater than or equal to 0",
 		}
+	}
 
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
+	if m.GetTotalComments() < 0 {
+		return CreateRequestValidationError{
+			field:  "TotalComments",
+			reason: "value must be greater than or equal to 0",
 		}
 	}
 
 	return nil
-}
-
-func (m *CreateRequest) _validateEmail(addr string) error {
-	a, err := mail.ParseAddress(addr)
-	if err != nil {
-		return err
-	}
-	addr = a.Address
-
-	if len(addr) > 254 {
-		return errors.New("email addresses cannot exceed 254 characters")
-	}
-
-	parts := strings.SplitN(addr, "@", 2)
-
-	if len(parts[0]) > 64 {
-		return errors.New("email address local phrase cannot exceed 64 characters")
-	}
-
-	return m._validateHostname(parts[1])
 }
 
 // CreateRequestValidationError is the validation error returned by
@@ -985,8 +827,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateRequestValidationError{}
-
-var _CreateRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for CreateResponse. This method will always return nil.
 func (m *CreateResponse) Validate() error {
@@ -1067,116 +907,78 @@ func (m *UpdateRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
-
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
-			return UpdateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return UpdateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_UpdateRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return UpdateRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
-			}
-		}
-
-	}
-
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return UpdateRequestValidationError{
-				field:  "FirstName",
+				field:  "Title",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetMobileTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return UpdateRequestValidationError{
-				field:  "LastName",
+				field:  "MobileTitle",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetEmail(); wrapper != nil {
+	if wrapper := m.GetOrder(); wrapper != nil {
 
-		if err := m._validateEmail(wrapper.GetValue()); err != nil {
+		if val := wrapper.GetValue(); val < 1 || val > 100 {
 			return UpdateRequestValidationError{
-				field:  "Email",
-				reason: "value must be a valid email address",
+				field:  "Order",
+				reason: "value must be inside range [1, 100]",
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetSearch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateRequestValidationError{
+				field:  "Search",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
 	}
 
-	return nil
-}
-
-func (m *UpdateRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
+	if utf8.RuneCountInString(m.GetDescription()) < 0 {
+		return UpdateRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 0 runes",
+		}
 	}
 
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+	if len(m.GetNotices()) > 5 {
+		return UpdateRequestValidationError{
+			field:  "Notices",
+			reason: "value must contain no more than 5 item(s)",
 		}
+	}
 
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
+	if m.GetTotalPosts() < 0 {
+		return UpdateRequestValidationError{
+			field:  "TotalPosts",
+			reason: "value must be greater than or equal to 0",
 		}
+	}
 
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
+	if m.GetTotalComments() < 0 {
+		return UpdateRequestValidationError{
+			field:  "TotalComments",
+			reason: "value must be greater than or equal to 0",
 		}
 	}
 
 	return nil
-}
-
-func (m *UpdateRequest) _validateEmail(addr string) error {
-	a, err := mail.ParseAddress(addr)
-	if err != nil {
-		return err
-	}
-	addr = a.Address
-
-	if len(addr) > 254 {
-		return errors.New("email addresses cannot exceed 254 characters")
-	}
-
-	parts := strings.SplitN(addr, "@", 2)
-
-	if len(parts[0]) > 64 {
-		return errors.New("email address local phrase cannot exceed 64 characters")
-	}
-
-	return m._validateHostname(parts[1])
 }
 
 func (m *UpdateRequest) _validateUuid(uuid string) error {
@@ -1240,8 +1042,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UpdateRequestValidationError{}
-
-var _UpdateRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for UpdateResponse. This method will always return nil.
 func (m *UpdateResponse) Validate() error {
@@ -1322,116 +1122,78 @@ func (m *DeleteRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
-
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
-			return DeleteRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return DeleteRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_DeleteRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return DeleteRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
-			}
-		}
-
-	}
-
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return DeleteRequestValidationError{
-				field:  "FirstName",
+				field:  "Title",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetMobileTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return DeleteRequestValidationError{
-				field:  "LastName",
+				field:  "MobileTitle",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetEmail(); wrapper != nil {
+	if wrapper := m.GetOrder(); wrapper != nil {
 
-		if err := m._validateEmail(wrapper.GetValue()); err != nil {
+		if val := wrapper.GetValue(); val < 1 || val > 100 {
 			return DeleteRequestValidationError{
-				field:  "Email",
-				reason: "value must be a valid email address",
+				field:  "Order",
+				reason: "value must be inside range [1, 100]",
+			}
+		}
+
+	}
+
+	if v, ok := interface{}(m.GetSearch()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DeleteRequestValidationError{
+				field:  "Search",
+				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
-
 	}
 
-	return nil
-}
-
-func (m *DeleteRequest) _validateHostname(host string) error {
-	s := strings.ToLower(strings.TrimSuffix(host, "."))
-
-	if len(host) > 253 {
-		return errors.New("hostname cannot exceed 253 characters")
+	if utf8.RuneCountInString(m.GetDescription()) < 0 {
+		return DeleteRequestValidationError{
+			field:  "Description",
+			reason: "value length must be at least 0 runes",
+		}
 	}
 
-	for _, part := range strings.Split(s, ".") {
-		if l := len(part); l == 0 || l > 63 {
-			return errors.New("hostname part must be non-empty and cannot exceed 63 characters")
+	if len(m.GetNotices()) > 5 {
+		return DeleteRequestValidationError{
+			field:  "Notices",
+			reason: "value must contain no more than 5 item(s)",
 		}
+	}
 
-		if part[0] == '-' {
-			return errors.New("hostname parts cannot begin with hyphens")
+	if m.GetTotalPosts() < 0 {
+		return DeleteRequestValidationError{
+			field:  "TotalPosts",
+			reason: "value must be greater than or equal to 0",
 		}
+	}
 
-		if part[len(part)-1] == '-' {
-			return errors.New("hostname parts cannot end with hyphens")
-		}
-
-		for _, r := range part {
-			if (r < 'a' || r > 'z') && (r < '0' || r > '9') && r != '-' {
-				return fmt.Errorf("hostname parts can only contain alphanumeric characters or hyphens, got %q", string(r))
-			}
+	if m.GetTotalComments() < 0 {
+		return DeleteRequestValidationError{
+			field:  "TotalComments",
+			reason: "value must be greater than or equal to 0",
 		}
 	}
 
 	return nil
-}
-
-func (m *DeleteRequest) _validateEmail(addr string) error {
-	a, err := mail.ParseAddress(addr)
-	if err != nil {
-		return err
-	}
-	addr = a.Address
-
-	if len(addr) > 254 {
-		return errors.New("email addresses cannot exceed 254 characters")
-	}
-
-	parts := strings.SplitN(addr, "@", 2)
-
-	if len(parts[0]) > 64 {
-		return errors.New("email address local phrase cannot exceed 64 characters")
-	}
-
-	return m._validateHostname(parts[1])
 }
 
 func (m *DeleteRequest) _validateUuid(uuid string) error {
@@ -1495,8 +1257,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteRequestValidationError{}
-
-var _DeleteRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for DeleteResponse. This method will always return nil.
 func (m *DeleteResponse) Validate() error {
