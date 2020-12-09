@@ -11,33 +11,33 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"github.com/thoas/go-funk"
 
-	board_entities "github.com/ygpark2/mboard/service/board/proto/entities"
 	boardPB "github.com/ygpark2/mboard/service/board/proto/board"
+	board_entities "github.com/ygpark2/mboard/service/board/proto/entities"
 	"github.com/ygpark2/mboard/service/board/repository"
 	myErrors "github.com/ygpark2/mboard/shared/errors"
 )
 
 // boardHandler struct
 type boardHandler struct {
-	boardRepository   repository.BoardRepository
-	event            *service.Event
+	boardRepository repository.BoardRepository
+	event           *service.Event
 }
 
 // NewBoardHandler returns an instance of `BoardServiceHandler`.
-func NewBoardHandler(repo repository.boardRepository, eve *service.Event) boardPB.BoardServiceHandler {
+func NewBoardHandler(repo repository.BoardRepository, eve *service.Event) boardPB.BoardServiceHandler {
 	return &boardHandler{
-		boardRepository:   repo,
-		event:            eve,
+		boardRepository: repo,
+		event:           eve,
 	}
 }
 
 func (h *boardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp *boardPB.ExistResponse) error {
 	log.Info().Msg("Received boardHandler.Exist request")
 	/*
-	google.protobuf.StringValue title = 7 [(gorm.field).tag = { size: 255 not_null: true }];
-    google.protobuf.StringValue mobile_title = 8 [(gorm.field).tag = { size: 255 not_null: true }];
-    google.protobuf.UInt32Value order = 9 [(gorm.field).tag = { not_null: true }];
-    google.protobuf.BoolValue search = 10 [(gorm.field).tag = { not_null: true }];
+			google.protobuf.StringValue title = 7 [(gorm.field).tag = { size: 255 not_null: true }];
+		    google.protobuf.StringValue mobile_title = 8 [(gorm.field).tag = { size: 255 not_null: true }];
+		    google.protobuf.UInt32Value order = 9 [(gorm.field).tag = { not_null: true }];
+		    google.protobuf.BoolValue search = 10 [(gorm.field).tag = { not_null: true }];
 	*/
 	model := board_entities.BoardORM{}
 	model.Id = uuid.FromStringOrNil(req.Id.GetValue())

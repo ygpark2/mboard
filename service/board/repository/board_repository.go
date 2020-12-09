@@ -2,9 +2,8 @@ package repository
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	"github.com/micro/micro/v3/service/logger"
+	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 
 	board_entities "github.com/ygpark2/mboard/service/board/proto/entities"
@@ -13,7 +12,7 @@ import (
 // boardRepository interface
 type BoardRepository interface {
 	Exist(model *board_entities.BoardORM) bool
-	List(limit, page int, sort string, model *board_entities.UserORM) (total int64, users []*board_entities.BoardORM, err error)
+	List(limit, page int, sort string, model *board_entities.BoardORM) (total int64, boards []*board_entities.BoardORM, err error)
 	Get(id string) (*board_entities.BoardORM, error)
 	Create(model *board_entities.BoardORM) error
 	Update(id string, model *board_entities.BoardORM) error
@@ -58,7 +57,7 @@ func (repo *boardRepository) Exist(model *board_entities.BoardORM) bool {
 }
 
 // List
-func (repo *boardRepository) List(limit, page int, sort string, model *board_entities.BoardORM) (total int64, users []*board_entities.BoardORM, err error) {
+func (repo *boardRepository) List(limit, page int, sort string, model *board_entities.BoardORM) (total int64, boards []*board_entities.BoardORM, err error) {
 	db := repo.db
 
 	if limit == 0 {
@@ -87,7 +86,7 @@ func (repo *boardRepository) List(limit, page int, sort string, model *board_ent
 		db = db.Where("email like ?", "%"+model.Email+"%")
 	}
 	// enable auto preloading for `Profile`
-	if err = db.Set("gorm:auto_preload", true).Order(sort).Limit(limit).Offset(offset).Find(&users).Count(&total).Error; err != nil {
+	if err = db.Set("gorm:auto_preload", true).Order(sort).Limit(limit).Offset(offset).Find(&boards).Count(&total).Error; err != nil {
 		logger.WithError(err).Error("Error in boardRepository.List")
 		return
 	}
