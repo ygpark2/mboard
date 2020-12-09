@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package contents;
+
+option go_package = "github.com/ygpark2/mboard/service/board/contents/proto/contents";
+option java_multiple_files = true;
+option java_package = "mkit.service.board.contents.v1";
+
+service ContentService {
+	rpc Save(Request) returns (Response) {}
+}
+
+message Request {
+	// post to comment on
+	string post_id = 1;
+	// message to leave
+	string message = 2;
+
+}
+
+message Response {}
