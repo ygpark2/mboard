@@ -1,10 +1,15 @@
 syntax = "proto3";
 
-package comments;
+package comment;
 
-option go_package = "github.com/ygpark2/mboard/service/board/comments/proto/comments";
+option go_package = "github.com/ygpark2/mboard/service/comment/proto/comment";
 option java_multiple_files = true;
-option java_package = "mkit.service.board.comments.v1";
+option java_package = "mkit.service.board.comment.v1";
+
+import "google/protobuf/wrappers.proto";
+// import "shared/proto/common/common.proto";
+import "service/comment/proto/entities/entities.proto";
+import "validate/validate.proto";
 
 service CommentService {
 	rpc Save(Request) returns (Response) {}

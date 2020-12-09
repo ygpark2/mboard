@@ -13,7 +13,7 @@ require (
 	github.com/infobloxopen/protoc-gen-gorm v0.20.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jinzhu/now v1.1.1 // indirect
-	github.com/lib/pq v1.8.0 // indirect
+	github.com/lib/pq v1.8.0
 	github.com/markbates/pkger v0.17.1
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/micro/v3 v3.0.3-0.20201203165704-226c32e1ea25
