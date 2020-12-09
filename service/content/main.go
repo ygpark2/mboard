@@ -13,7 +13,7 @@ func main() {
 	)
 
 	// Register Handler
-	srv.Handle(new(handler.Contents))
+	srv.Handle(new(handler.ContentService))
 
 	// Run service
 	if err := srv.Run(); err != nil {
