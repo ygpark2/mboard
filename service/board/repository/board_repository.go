@@ -35,8 +35,8 @@ func NewBoardRepository(db *gorm.DB) BoardRepository {
 func (repo *boardRepository) Exist(model *board_entities.BoardORM) bool {
 	logger.Infof("Received boardRepository.Exist request %v", *model)
 	var count int64
-	if model.Username != nil && len(*model.Username) > 0 {
-		repo.db.Model(&board_entities.BoardORM{}).Where("username = ?", model.Username).Count(&count)
+	if model.Title != nil && len(*model.Title) > 0 {
+		repo.db.Model(&board_entities.BoardORM{}).Where("title = ?", model.Title).Count(&count)
 		if count > 0 {
 			return true
 		}
@@ -47,8 +47,8 @@ func (repo *boardRepository) Exist(model *board_entities.BoardORM) bool {
 			return true
 		}
 	}
-	if model.Email != "" {
-		repo.db.Model(&board_entities.BoardORM{}).Where("email = ?", model.Email).Count(&count)
+	if *model.MobileTitle != "" {
+		repo.db.Model(&board_entities.BoardORM{}).Where("mobile_title = ?", model.MobileTitle).Count(&count)
 		if count > 0 {
 			return true
 		}
@@ -73,21 +73,18 @@ func (repo *boardRepository) List(limit, page int, sort string, model *board_ent
 		sort = "created_at desc"
 	}
 
-	if model.Username != nil && len(*model.Username) > 0 {
-		db = db.Where("username like ?", "%"+*model.Username+"%")
+	if model.Title != nil && len(*model.Title) > 0 {
+		db = db.Where("title like ?", "%"+*model.Title+"%")
 	}
-	if model.FirstName != "" {
-		db = db.Where("first_name like ?", "%"+model.FirstName+"%")
+	if *model.MobileTitle != "" {
+		db = db.Where("mobile_title like ?", "%"+*model.Title+"%")
 	}
-	if model.LastName != "" {
-		db = db.Where("last_name like ?", "%"+model.LastName+"%")
-	}
-	if model.Email != "" {
-		db = db.Where("email like ?", "%"+model.Email+"%")
+	if model.Description != "" {
+		db = db.Where("description like ?", "%"+model.Description+"%")
 	}
 	// enable auto preloading for `Profile`
 	if err = db.Set("gorm:auto_preload", true).Order(sort).Limit(limit).Offset(offset).Find(&boards).Count(&total).Error; err != nil {
-		logger.WithError(err).Error("Error in boardRepository.List")
+		logger.Error("Error in boardRepository.List")
 		return
 	}
 	return
@@ -102,7 +99,7 @@ func (repo *boardRepository) Get(id string) (user *board_entities.BoardORM, err 
 	user = &board_entities.BoardORM{Id: u2}
 	// enable auto preloading for `Profile`
 	if err = repo.db.Set("gorm:auto_preload", true).First(user).Error; err != nil && err != gorm.ErrRecordNotFound {
-		logger.WithError(err).Error("Error in boardRepository.Get")
+		logger.Error("Error in boardRepository.Get")
 	}
 	return
 }
@@ -114,7 +111,7 @@ func (repo *boardRepository) Create(model *board_entities.BoardORM) error {
 	}
 	// if err := repo.db.Set("gorm:association_autoupdate", false).Create(model).Error; err != nil {
 	if err := repo.db.Create(model).Error; err != nil {
-		logger.WithError(err).Error("Error in boardRepository.Create")
+		logger.Error("Error in boardRepository.Create")
 		return err
 	}
 	return nil
@@ -132,7 +129,7 @@ func (repo *boardRepository) Update(id string, model *board_entities.BoardORM) e
 	// result := repo.db.Set("gorm:association_autoupdate", false).Save(model)
 	result := repo.db.Model(user).Updates(model)
 	if err := result.Error; err != nil {
-		logger.WithError(err).Error("Error in boardRepository.Update")
+		logger.Error("Error in boardRepository.Update")
 		return err
 	}
 	if rowsAffected := result.RowsAffected; rowsAffected == 0 {
@@ -146,7 +143,7 @@ func (repo *boardRepository) Update(id string, model *board_entities.BoardORM) e
 func (repo *boardRepository) Delete(model *board_entities.BoardORM) error {
 	result := repo.db.Delete(model)
 	if err := result.Error; err != nil {
-		logger.WithError(err).Error("Error in boardRepository.Delete")
+		logger.Error("Error in boardRepository.Delete")
 		return err
 	}
 	if rowsAffected := result.RowsAffected; rowsAffected == 0 {

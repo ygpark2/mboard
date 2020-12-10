@@ -41,12 +41,14 @@ func (h *boardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp
 	*/
 	model := board_entities.BoardORM{}
 	model.Id = uuid.FromStringOrNil(req.Id.GetValue())
-	title := req.title.GetValue()
-	model.title = &title
-	mobile_title := req.mobile_title.GetValue()
-	model.mobile_title = &mobile_title
-	model.order = req.order.GetValue()
-	model.search = req.search.GetValue()
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	order := req.Order.GetValue()
+	model.Order = &order
+	search := req.Search.GetValue()
+	model.Search = &search
 
 	exists := h.boardRepository.Exist(&model)
 	log.Info().Msgf("user exists? %t", exists)
@@ -57,11 +59,14 @@ func (h *boardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp
 func (h *boardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *boardPB.ListResponse) error {
 	log.Info().Msg("Received boardHandler.List request")
 	model := board_entities.BoardORM{}
-	username := req.Username.GetValue()
-	model.Username = &username
-	model.FirstName = req.FirstName.GetValue()
-	model.LastName = req.LastName.GetValue()
-	model.Email = req.Email.GetValue()
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	model.Description = req.Description
+	model.Notices = req.Notices
+	model.Order = &req.Order.Value
+	model.Search = &req.Search.Value
 
 	total, boards, err := h.boardRepository.List(int(req.Limit.GetValue()), int(req.Page.GetValue()), req.Sort.GetValue(), &model)
 	if err != nil {
@@ -76,7 +81,7 @@ func (h *boardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *
 	// 	// *newBoards[index], _ = board.ToPB(ctx) ???
 	// }
 	newBoards := funk.Map(boards, func(board *board_entities.BoardORM) *board_entities.BoardORM {
-		tmpUser, _ := board.ToPB(ctx)
+		tmpBoard, _ := board.ToPB(ctx)
 		return &tmpBoard
 	}).([]*board_entities.BoardORM)
 
@@ -91,7 +96,7 @@ func (h *boardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *bo
 	if id == "" {
 		return myErrors.ValidationError("mkit.service.account.user.get", "validation error: Missing Id")
 	}
-	user, err := h.boardRepository.Get(id)
+	board, err := h.boardRepository.Get(id)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			rsp.Result = nil
@@ -100,8 +105,8 @@ func (h *boardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *bo
 		return myErrors.AppError(myErrors.DBE, err)
 	}
 
-	tempUser, _ := user.ToPB(ctx)
-	rsp.Result = &tempUser
+	tempBoard, _ := board.ToPB(ctx)
+	rsp.Result = &tempBoard
 
 	return nil
 }
@@ -109,12 +114,15 @@ func (h *boardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *bo
 func (h *boardHandler) Create(ctx context.Context, req *boardPB.CreateRequest, rsp *boardPB.CreateResponse) error {
 	log.Info().Msg("Received boardHandler.Create request")
 
-	model := account_entities.UserORM{}
-	username := req.Username.GetValue()
-	model.Username = &username
-	model.FirstName = req.FirstName.GetValue()
-	model.LastName = req.LastName.GetValue()
-	model.Email = req.Email.GetValue()
+	model := board_entities.BoardORM{}
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	model.Description = req.Description
+	model.Notices = req.Notices
+	model.Order = &req.Order.Value
+	model.Search = &req.Search.Value
 
 	if err := h.boardRepository.Create(&model); err != nil {
 		return myErrors.AppError(myErrors.DBE, err)
@@ -145,12 +153,15 @@ func (h *boardHandler) Update(ctx context.Context, req *boardPB.UpdateRequest, r
 		return myErrors.ValidationError("mkit.service.account.user.update", "validation error: Missing Id")
 	}
 
-	model := account_entities.UserORM{}
-	username := req.Username.GetValue()
-	model.Username = &username
-	model.FirstName = req.FirstName.GetValue()
-	model.LastName = req.LastName.GetValue()
-	model.Email = req.Email.GetValue()
+	model := board_entities.BoardORM{}
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	model.Description = req.Description
+	model.Notices = req.Notices
+	model.Order = &req.Order.Value
+	model.Search = &req.Search.Value
 
 	if err := h.boardRepository.Update(id, &model); err != nil {
 		return myErrors.AppError(myErrors.DBE, err)
@@ -167,7 +178,7 @@ func (h *boardHandler) Delete(ctx context.Context, req *boardPB.DeleteRequest, r
 		return myErrors.ValidationError("mkit.service.account.user.update", "validation error: Missing Id")
 	}
 
-	model := account_entities.UserORM{}
+	model := board_entities.BoardORM{}
 	model.Id = uuid.FromStringOrNil(id)
 
 	if err := h.boardRepository.Delete(&model); err != nil {
