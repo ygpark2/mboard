@@ -80,10 +80,10 @@ func (h *boardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *
 	// 	newBoards[index] = &tmpBoard
 	// 	// *newBoards[index], _ = board.ToPB(ctx) ???
 	// }
-	newBoards := funk.Map(boards, func(board *board_entities.BoardORM) *board_entities.BoardORM {
+	newBoards := funk.Map(boards, func(board *board_entities.BoardORM) *board_entities.Board {
 		tmpBoard, _ := board.ToPB(ctx)
 		return &tmpBoard
-	}).([]*board_entities.BoardORM)
+	}).([]*board_entities.Board)
 
 	rsp.Results = newBoards
 	return nil

@@ -3,8 +3,7 @@ package main
 import (
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"
-	"github.com/ygpark2/mboard/service/board/handler"
-	tags "github.com/micro/services/blog/tags/proto"
+	// tags "github.com/micro/services/blog/tags/proto"
 )
 
 func main() {
@@ -14,11 +13,11 @@ func main() {
 	)
 
 	// Register Handler
-	srv.Handle(new(handler.BoardHander))
+	srv.Handle(new(handler.boardHandler))
 	/*
-	srv.Handle(&handler.Posts{
-		Tags: tags.NewTagsService("tags", srv.Client()),
-	})
+		srv.Handle(&handler.Posts{
+			Tags: tags.NewTagsService("tags", srv.Client()),
+		})
 	*/
 
 	// Run service
