@@ -8,6 +8,7 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-cmp v0.5.3 // indirect
+	github.com/google/wire v0.4.0
 	github.com/gosimple/slug v1.9.0
 	github.com/infobloxopen/atlas-app-toolkit v0.22.1
 	github.com/infobloxopen/protoc-gen-gorm v0.20.0

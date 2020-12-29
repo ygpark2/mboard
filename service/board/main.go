@@ -7,6 +7,9 @@ import (
 )
 
 func main() {
+	event := InitializeEvent()
+	event.Start()
+
 	// Create the service
 	srv := service.New(
 		service.Name("boards"),

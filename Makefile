@@ -56,10 +56,11 @@ all: build
 
 tools:
 	@echo "==> Installing dev tools"
-	go install github.com/ahmetb/govvv
-	go install github.com/markbates/pkger/cmd/pkger
+	GO111MODULE=off go get github.com/ahmetb/govvv
+	GO111MODULE=off go get github.com/markbates/pkger/cmd/pkger
 	GO111MODULE=off go get github.com/golangci/golangci-lint/cmd/golangci-lint
 	GO111MODULE=on go get github.com/bufbuild/buf/cmd/buf
+	GO111MODULE=on go get github.com/google/wire/cmd/wire
 	GO111MODULE=on go get github.com/rvflash/goup
 
 check_dirty:
