@@ -1,8 +1,12 @@
 package main
 
-import "github.com/google/wire"
+import (
+	"github.com/google/wire"
 
-func InitializeEvent() Event {
-	wire.Build(NewEvent, NewGreeter, NewMessage)
-	return Event{}
+	"github.com/ygpark2/mboard/service/board/repository"
+)
+
+func InitializeEvent(phrase string) (Event, error) {
+	wire.Build(repository.NewBoardRepository, NewGreeter, NewMessage)
+	return Event{}, nil
 }

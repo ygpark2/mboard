@@ -7,7 +7,7 @@ import (
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/auth"
 	"github.com/micro/micro/v3/service/errors"
-	"github.com/rs/zerolog/log"
+	"github.com/micro/micro/v3/service/logger"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thoas/go-funk"
 
@@ -32,7 +32,7 @@ func NewBoardHandler(repo repository.BoardRepository, eve *service.Event) boardP
 }
 
 func (h *boardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp *boardPB.ExistResponse) error {
-	log.Info().Msg("Received boardHandler.Exist request")
+	logger.Info("Received boardHandler.Exist request")
 	/*
 			google.protobuf.StringValue title = 7 [(gorm.field).tag = { size: 255 not_null: true }];
 		    google.protobuf.StringValue mobile_title = 8 [(gorm.field).tag = { size: 255 not_null: true }];
@@ -51,13 +51,13 @@ func (h *boardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp
 	model.Search = &search
 
 	exists := h.boardRepository.Exist(&model)
-	log.Info().Msgf("user exists? %t", exists)
+	logger.Info("user exists? %t", exists)
 	rsp.Result = exists
 	return nil
 }
 
 func (h *boardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *boardPB.ListResponse) error {
-	log.Info().Msg("Received boardHandler.List request")
+	logger.Info("Received boardHandler.List request")
 	model := board_entities.BoardORM{}
 	title := req.Title.GetValue()
 	model.Title = &title
@@ -90,7 +90,7 @@ func (h *boardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *
 }
 
 func (h *boardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *boardPB.GetResponse) error {
-	log.Info().Msg("Received boardHandler.Get request")
+	logger.Info("Received boardHandler.Get request")
 
 	id := req.Id.GetValue()
 	if id == "" {
@@ -112,7 +112,7 @@ func (h *boardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *bo
 }
 
 func (h *boardHandler) Create(ctx context.Context, req *boardPB.CreateRequest, rsp *boardPB.CreateResponse) error {
-	log.Info().Msg("Received boardHandler.Create request")
+	logger.Info("Received boardHandler.Create request")
 
 	model := board_entities.BoardORM{}
 	title := req.Title.GetValue()
@@ -140,13 +140,13 @@ func (h *boardHandler) Create(ctx context.Context, req *boardPB.CreateRequest, r
 }
 
 func (h *boardHandler) Update(ctx context.Context, req *boardPB.UpdateRequest, rsp *boardPB.UpdateResponse) error {
-	log.Info().Msg("Received boardHandler.Update request")
+	logger.Info("Received boardHandler.Update request")
 	// Identify the user
 	acc, ok := auth.AccountFromContext(ctx)
 	if !ok {
 		return errors.Unauthorized("mkit.service.account.user.update", "A valid auth token is required")
 	}
-	log.Info().Msgf("Caller Account: %v", acc)
+	logger.Info("Caller Account: %v", acc)
 
 	id := req.Id.GetValue()
 	if id == "" {
@@ -171,7 +171,7 @@ func (h *boardHandler) Update(ctx context.Context, req *boardPB.UpdateRequest, r
 }
 
 func (h *boardHandler) Delete(ctx context.Context, req *boardPB.DeleteRequest, rsp *boardPB.DeleteResponse) error {
-	log.Info().Msg("Received boardHandler.Delete request")
+	logger.Info("Received boardHandler.Delete request")
 
 	id := req.Id.GetValue()
 	if id == "" {

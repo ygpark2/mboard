@@ -58,8 +58,11 @@ tools:
 	@echo "==> Installing dev tools"
 	GO111MODULE=off go get github.com/ahmetb/govvv
 	GO111MODULE=off go get github.com/markbates/pkger/cmd/pkger
-	GO111MODULE=off go get github.com/golangci/golangci-lint/cmd/golangci-lint
-	GO111MODULE=on go get github.com/bufbuild/buf/cmd/buf
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.34.1
+	GO111MODULE=on GOBIN=$(go env GOPATH)/bin go get \
+			github.com/bufbuild/buf/cmd/buf \
+			github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking \
+			github.com/bufbuild/buf/cmd/protoc-gen-buf-lint
 	GO111MODULE=on go get github.com/google/wire/cmd/wire
 	GO111MODULE=on go get github.com/rvflash/goup
 
@@ -185,11 +188,13 @@ endif
 			for _target in $${type}/*/; do \
 				temp=$${_target%%/}; target=$${temp#*/}; \
 				echo "\tBuilding $${target}-$${type}"; \
+				wire ./$${type}/$${target}/wire.go; \
 				CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o build/$${target}-$${type} -a -trimpath -ldflags "-w -s ${BUILD_FLAGS}" ./$${type}/$${target}; \
 			done \
 		done \
 	else \
 		echo "Building ${TARGET}-${TYPE}"; \
+		wire ./${TYPE}/${TARGET}/wire.go; \
 		go build -mod=vendor -o build/${TARGET}-${TYPE} -a -trimpath -ldflags "-w -s ${BUILD_FLAGS}" ./${TYPE}/${TARGET}; \
 	fi
 
