@@ -1,32 +1,19 @@
 package registry
 
 import (
-	"github.com/google/wire"
-
+	board_entities "github.com/ygpark2/mboard/service/board/proto/entities"
+	"github.com/ygpark2/mboard/service/board/repository"
+	"github.com/ygpark2/mboard/shared/database"
 	configPB "github.com/ygpark2/mboard/shared/proto/config"
 )
 
-// Container - provide di Container
-type Container struct {
-	ctn wire.ProviderSet
-}
+func buildBoardRepository(cfg configPB.Configuration) (interface{}, error) {
+	// db := database.GetDatabaseConnection(*cfg.Database).(*gorm.DB)
 
-// NewContainer - create new Container
-func NewContainer(cfg configPB.Configuration) (*Container, error) {
-	providerSet := wire.NewSet()
+	db, err := database.GetDatabaseConnection(*cfg.Database)
+	if err != nil {
+		db.AutoMigrate(&board_entities.BoardORM{})
+	}
 
-	providerSet.add()
-
-	wire.NewSet()
-
-	panic(wire.Build(
-		wire.Struct(new(Logger), "*"),
-		NewHttpClient,
-		NewConcatService,
-	))
-	/*
-		return &Container{
-			ctn: wire.Build(providerSet),
-		}, nil
-	*/
+	return repository.NewBoardRepository(db), nil
 }
