@@ -6,7 +6,10 @@ import (
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 
+	"github.com/ygpark2/mboard/shared/database"
+
 	board_entities "github.com/ygpark2/mboard/service/board/proto/entities"
+	configPB "github.com/ygpark2/mboard/shared/proto/config"
 )
 
 // boardRepository interface
@@ -22,6 +25,17 @@ type BoardRepository interface {
 // boardRepository struct
 type boardRepository struct {
 	db *gorm.DB
+}
+
+func BuildBoardRepository(cfg configPB.Configuration) BoardRepository {
+	// db := database.GetDatabaseConnection(*cfg.Database).(*gorm.DB)
+
+	db, err := database.GetDatabaseConnection(*cfg.Database)
+	if err != nil {
+		db.AutoMigrate(&board_entities.BoardORM{})
+	}
+
+	return NewBoardRepository(db)
 }
 
 // NewBoardRepository returns an instance of `BoardRepository`.

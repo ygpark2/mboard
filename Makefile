@@ -80,6 +80,10 @@ clean:
 		echo "Deleting $$f;"; \
 		rm -f $$f; \
 	done
+	@for f in */*/*/wire_gen.go ; do \
+		echo "Deleting $$f;"; \
+		rm -f $$f; \
+	done
 
 update_deps:
 	go mod verify
@@ -188,13 +192,13 @@ endif
 			for _target in $${type}/*/; do \
 				temp=$${_target%%/}; target=$${temp#*/}; \
 				echo "\tBuilding $${target}-$${type}"; \
-				wire ./$${type}/$${target}/wire.go; \
+				wire ./$${type}/$${target}/registry/wire.go; \
 				CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o build/$${target}-$${type} -a -trimpath -ldflags "-w -s ${BUILD_FLAGS}" ./$${type}/$${target}; \
 			done \
 		done \
 	else \
 		echo "Building ${TARGET}-${TYPE}"; \
-		wire ./${TYPE}/${TARGET}/wire.go; \
+		cd ./${TYPE}/${TARGET}/registry/ && wire && cd ../../..; \
 		go build -mod=vendor -o build/${TARGET}-${TYPE} -a -trimpath -ldflags "-w -s ${BUILD_FLAGS}" ./${TYPE}/${TARGET}; \
 	fi
 

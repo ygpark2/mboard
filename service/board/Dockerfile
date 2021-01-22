@@ -1,3 +1,3 @@
 FROM alpine
-ADD post-service /post-service
-ENTRYPOINT [ "/post-service" ]
+ADD board-service /board-service
+ENTRYPOINT [ "/board-service" ]

@@ -18,20 +18,20 @@ import (
 )
 
 // boardHandler struct
-type boardHandler struct {
+type BoardHandler struct {
 	boardRepository repository.BoardRepository
 	event           *service.Event
 }
 
 // NewBoardHandler returns an instance of `BoardServiceHandler`.
 func NewBoardHandler(repo repository.BoardRepository, eve *service.Event) boardPB.BoardServiceHandler {
-	return &boardHandler{
+	return &BoardHandler{
 		boardRepository: repo,
 		event:           eve,
 	}
 }
 
-func (h *boardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp *boardPB.ExistResponse) error {
+func (h *BoardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp *boardPB.ExistResponse) error {
 	logger.Info("Received boardHandler.Exist request")
 	/*
 			google.protobuf.StringValue title = 7 [(gorm.field).tag = { size: 255 not_null: true }];
@@ -56,7 +56,7 @@ func (h *boardHandler) Exist(ctx context.Context, req *boardPB.ExistRequest, rsp
 	return nil
 }
 
-func (h *boardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *boardPB.ListResponse) error {
+func (h *BoardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *boardPB.ListResponse) error {
 	logger.Info("Received boardHandler.List request")
 	model := board_entities.BoardORM{}
 	title := req.Title.GetValue()
@@ -89,7 +89,7 @@ func (h *boardHandler) List(ctx context.Context, req *boardPB.ListRequest, rsp *
 	return nil
 }
 
-func (h *boardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *boardPB.GetResponse) error {
+func (h *BoardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *boardPB.GetResponse) error {
 	logger.Info("Received boardHandler.Get request")
 
 	id := req.Id.GetValue()
@@ -111,7 +111,7 @@ func (h *boardHandler) Get(ctx context.Context, req *boardPB.GetRequest, rsp *bo
 	return nil
 }
 
-func (h *boardHandler) Create(ctx context.Context, req *boardPB.CreateRequest, rsp *boardPB.CreateResponse) error {
+func (h *BoardHandler) Create(ctx context.Context, req *boardPB.CreateRequest, rsp *boardPB.CreateResponse) error {
 	logger.Info("Received boardHandler.Create request")
 
 	model := board_entities.BoardORM{}
@@ -139,7 +139,7 @@ func (h *boardHandler) Create(ctx context.Context, req *boardPB.CreateRequest, r
 	return nil
 }
 
-func (h *boardHandler) Update(ctx context.Context, req *boardPB.UpdateRequest, rsp *boardPB.UpdateResponse) error {
+func (h *BoardHandler) Update(ctx context.Context, req *boardPB.UpdateRequest, rsp *boardPB.UpdateResponse) error {
 	logger.Info("Received boardHandler.Update request")
 	// Identify the user
 	acc, ok := auth.AccountFromContext(ctx)
@@ -170,7 +170,7 @@ func (h *boardHandler) Update(ctx context.Context, req *boardPB.UpdateRequest, r
 	return nil
 }
 
-func (h *boardHandler) Delete(ctx context.Context, req *boardPB.DeleteRequest, rsp *boardPB.DeleteResponse) error {
+func (h *BoardHandler) Delete(ctx context.Context, req *boardPB.DeleteRequest, rsp *boardPB.DeleteResponse) error {
 	logger.Info("Received boardHandler.Delete request")
 
 	id := req.Id.GetValue()

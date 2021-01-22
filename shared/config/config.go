@@ -1,40 +1,42 @@
 package config
 
 import (
-    "crypto/tls"
-    "fmt"
-    "net"
-    "os"
-    "runtime"
-    "strings"
-    "sync"
+	"crypto/tls"
+	"fmt"
+	"io/ioutil"
+	"net"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
+	"sync"
 
-    "github.com/pkg/errors"
-    "github.com/rs/zerolog/log"
-    "github.com/xmlking/configor"
-    "google.golang.org/grpc/resolver"
+	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
+	"github.com/xmlking/configor"
+	"google.golang.org/grpc/resolver"
 
-    configPB "github.com/ygpark2/mboard/shared/proto/config"
-    uTLS "github.com/ygpark2/mboard/shared/util/tls"
+	configPB "github.com/ygpark2/mboard/shared/proto/config"
+	uTLS "github.com/ygpark2/mboard/shared/util/tls"
 )
 
 var (
-    Configor   *configor.Configor
-    cfg        configPB.Configuration
-    configLock = new(sync.RWMutex)
+	Configor   *configor.Configor
+	cfg        configPB.Configuration
+	configLock = new(sync.RWMutex)
 
-    // Version is populated by govvv in compile-time.
-    Version = "untouched"
-    // BuildDate is populated by govvv.
-    BuildDate string
-    // GitCommit is populated by govvv.
-    GitCommit string
-    // GitBranch is populated by govvv.
-    GitBranch string
-    // GitState is populated by govvv.
-    GitState string
-    // GitSummary is populated by govvv.
-    GitSummary string
+	// Version is populated by govvv in compile-time.
+	Version = "untouched"
+	// BuildDate is populated by govvv.
+	BuildDate string
+	// GitCommit is populated by govvv.
+	GitCommit string
+	// GitBranch is populated by govvv.
+	GitBranch string
+	// GitState is populated by govvv.
+	GitState string
+	// GitSummary is populated by govvv.
+	GitSummary string
 )
 
 // VersionMsg is the message that is shown after process started.
@@ -51,20 +53,65 @@ git summary : %s
 `
 
 func init() {
-    configPath, exists := os.LookupEnv("CONFIGOR_FILE_PATH")
-    if !exists {
-        configPath = "/config/config.yaml"
-    }
 
-    Configor = configor.New(&configor.Config{UsePkger: true, ErrorOnUnmatchedKeys: true})
-    log.Info().Msgf("loading configuration from file: %s", configPath)
-    if err := Configor.Load(&cfg, configPath); err != nil {
-        if strings.Contains(err.Error(), "no such file") {
-            log.Panic().Err(err).Msgf("missing config file at %s", configPath)
-        } else {
-            log.Fatal().Err(err).Send()
-        }
-    }
+	log.Debug().Msg("++++++++++++++++++++++++++++ start init function +++++++++++++++++++++++++++++")
+
+	err := filepath.Walk("../../config", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		fmt.Println(path, info.Size())
+		return nil
+	})
+
+	if err != nil {
+		log.Panic().Err(err).Msg("error ==========")
+	}
+
+	log.Debug().Msg("++++++++++++++++++++++++++++ end of content +++++++++++++++++++++++++++++")
+
+	rootFiles, errRoot := ioutil.ReadDir("/")
+	if errRoot != nil {
+		log.Panic().Err(errRoot).Msg("error ==========")
+	}
+
+	for _, file := range rootFiles {
+		fmt.Println(file.Name())
+	}
+
+	shell, exists := os.LookupEnv("SHELL")
+	if exists {
+		log.Info().Msgf("Shell info : %s", shell)
+	}
+	goroot, exists := os.LookupEnv("GOROOT")
+	if exists {
+		log.Info().Msgf("GOROOT info : %s", goroot)
+	}
+	gopath, exists := os.LookupEnv("GOPATH")
+	if exists {
+		log.Info().Msgf("GOPATH info : %s", gopath)
+	}
+	configFilePath, exists := os.LookupEnv("CONFIGOR_FILE_PATH")
+	if exists {
+		log.Info().Msgf("CONFIGOR_FILE_PATH info : %s", configFilePath)
+	}
+
+	configPath, exists := os.LookupEnv("CONFIGOR_FILE_PATH")
+	log.Info().Msgf("First loading configuration from file: %s", configPath)
+	if !exists {
+		// configPath = "/home/ygpark2/pjt/golang/mboard/config/config.yaml"
+		configPath = "../../config/config.yaml"
+	}
+
+	Configor = configor.New(&configor.Config{UsePkger: false, ErrorOnUnmatchedKeys: true})
+	log.Info().Msgf("loading configuration from file: %s", configPath)
+	if err := Configor.Load(&cfg, configPath); err != nil {
+		if strings.Contains(err.Error(), "no such file") {
+			log.Panic().Err(err).Msgf("missing config file at %s", configPath)
+		} else {
+			log.Fatal().Err(err).Send()
+		}
+	}
 }
 
 /**
@@ -72,76 +119,76 @@ func init() {
 */
 
 func GetBuildInfo() string {
-    return fmt.Sprintf(versionMsg, Version, BuildDate, runtime.Version(), runtime.Compiler, runtime.GOOS, runtime.GOARCH,
-        GitCommit, GitBranch, GitState, GitSummary)
+	return fmt.Sprintf(versionMsg, Version, BuildDate, runtime.Version(), runtime.Compiler, runtime.GOOS, runtime.GOARCH,
+		GitCommit, GitBranch, GitState, GitSummary)
 }
 
 func GetConfig() configPB.Configuration { // FIXME: return a deep copy?
-    configLock.RLock()
-    defer configLock.RUnlock()
-    return cfg
+	configLock.RLock()
+	defer configLock.RUnlock()
+	return cfg
 }
 
 func CreateServerCerts() (tlsConfig *tls.Config, err error) {
-    configLock.RLock()
-    defer configLock.RUnlock()
-    tlsConf := cfg.Features.Tls
-    return uTLS.GetTLSConfig(tlsConf.CertFile, tlsConf.KeyFile, tlsConf.CaFile, tlsConf.Servername)
+	configLock.RLock()
+	defer configLock.RUnlock()
+	tlsConf := cfg.Features.Tls
+	return uTLS.GetTLSConfig(tlsConf.CertFile, tlsConf.KeyFile, tlsConf.CaFile, tlsConf.Servername)
 }
 
 func IsProduction() bool {
-    return Configor.GetEnvironment() == "production"
+	return Configor.GetEnvironment() == "production"
 }
 
 func IsSecure() bool {
-    configLock.RLock()
-    defer configLock.RUnlock()
-    return cfg.Features.Tls.Enabled
+	configLock.RLock()
+	defer configLock.RUnlock()
+	return cfg.Features.Tls.Enabled
 }
 
 func GetListener(endpoint string) (lis net.Listener, err error) {
-    configLock.RLock()
-    defer configLock.RUnlock()
+	configLock.RLock()
+	defer configLock.RUnlock()
 
-    target := ParseTarget(endpoint)
+	target := ParseTarget(endpoint)
 
-    switch target.Scheme {
-    case "unix":
-        return net.Listen("unix", target.Endpoint)
-    case "tcp", "dns", "kubernetes":
-        var port string
-        if _, port, err = net.SplitHostPort(target.Endpoint); err == nil {
-            if port == "" {
-                port = "0"
-            }
-        } else {
-            return nil, errors.New(fmt.Sprintf("unable to parse host and port from endpoint: %s", endpoint))
-        }
+	switch target.Scheme {
+	case "unix":
+		return net.Listen("unix", target.Endpoint)
+	case "tcp", "dns", "kubernetes":
+		var port string
+		if _, port, err = net.SplitHostPort(target.Endpoint); err == nil {
+			if port == "" {
+				port = "0"
+			}
+		} else {
+			return nil, errors.New(fmt.Sprintf("unable to parse host and port from endpoint: %s", endpoint))
+		}
 
-        tlsConf := cfg.Features.Tls
-        if tlsConf.Enabled {
-            if tlsConfig, err := uTLS.GetTLSConfig(tlsConf.CertFile, tlsConf.KeyFile, tlsConf.CaFile, tlsConf.Servername); err != nil {
-                return nil, err
-            } else {
-                return tls.Listen("tcp", fmt.Sprintf("0:%s", port), tlsConfig)
-            }
-        } else {
-            return net.Listen("tcp", fmt.Sprintf("0:%s", port))
-        }
-    default:
-        return nil, errors.New(fmt.Sprintf("unknown scheme: %s in endpoint: %s", target.Scheme, endpoint))
-    }
+		tlsConf := cfg.Features.Tls
+		if tlsConf.Enabled {
+			if tlsConfig, err := uTLS.GetTLSConfig(tlsConf.CertFile, tlsConf.KeyFile, tlsConf.CaFile, tlsConf.Servername); err != nil {
+				return nil, err
+			} else {
+				return tls.Listen("tcp", fmt.Sprintf("0:%s", port), tlsConfig)
+			}
+		} else {
+			return net.Listen("tcp", fmt.Sprintf("0:%s", port))
+		}
+	default:
+		return nil, errors.New(fmt.Sprintf("unknown scheme: %s in endpoint: %s", target.Scheme, endpoint))
+	}
 }
 
 //*** Copied from https://github.com/grpc/grpc-go/blob/master/internal/grpcutil/target.go ***/
 // split2 returns the values from strings.SplitN(s, sep, 2).
 // If sep is not found, it returns ("", "", false) instead.
 func split2(s, sep string) (string, string, bool) {
-    spl := strings.SplitN(s, sep, 2)
-    if len(spl) < 2 {
-        return "", "", false
-    }
-    return spl[0], spl[1], true
+	spl := strings.SplitN(s, sep, 2)
+	if len(spl) < 2 {
+		return "", "", false
+	}
+	return spl[0], spl[1], true
 }
 
 // ParseTarget splits target into a resolver.Target struct containing scheme,
@@ -150,14 +197,14 @@ func split2(s, sep string) (string, string, bool) {
 // If target is not a valid scheme://authority/endpoint, it returns {Endpoint:
 // target}.
 func ParseTarget(target string) (ret resolver.Target) {
-    var ok bool
-    ret.Scheme, ret.Endpoint, ok = split2(target, "://")
-    if !ok {
-        return resolver.Target{Endpoint: target}
-    }
-    ret.Authority, ret.Endpoint, ok = split2(ret.Endpoint, "/")
-    if !ok {
-        return resolver.Target{Endpoint: target}
-    }
-    return ret
+	var ok bool
+	ret.Scheme, ret.Endpoint, ok = split2(target, "://")
+	if !ok {
+		return resolver.Target{Endpoint: target}
+	}
+	ret.Authority, ret.Endpoint, ok = split2(ret.Endpoint, "/")
+	if !ok {
+		return resolver.Target{Endpoint: target}
+	}
+	return ret
 }
