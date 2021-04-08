@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package mkit.service.account.post.v1;
+package mkit.service.post.v1;
 
 option go_package = "github.com/ygpark2/mboard/service/post/proto/post";
 option java_multiple_files = true;
-option java_package = "mkit.service.account.post.v1";
+option java_package = "mkit.service.post.v1";
 
 import "google/protobuf/wrappers.proto";
 // import "shared/proto/common/common.proto";
@@ -28,15 +28,15 @@ service PostService {
 // with Workaround in .override.go
 message ExistRequest {
     google.protobuf.StringValue id = 1 [(validate.rules).string.uuid = true]; // Not Working
-    google.protobuf.StringValue username = 2 [(validate.rules).string = {
-    min_len: 4
-    max_len: 16
-    pattern: "^[a-z0-9_-]{3,15}$"
-    max_bytes: 256
-  }];
-    google.protobuf.StringValue first_name = 3 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue last_name = 4 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue email = 5 [(validate.rules).string.email = true]; // Not Working
+    google.protobuf.StringValue board_id = 2 [(validate.rules).string.uuid = true];
+    google.protobuf.StringValue title = 3 [(validate.rules).string.min_len = 2];
+    google.protobuf.StringValue slug = 4 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue category = 5 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue password = 6 [(validate.rules).string.min_len = 5];
+    repeated string tags = 7 [(validate.rules).repeated = {min_items: 0, max_items: 20}];
+    google.protobuf.StringValue content = 8 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue email = 9 [(validate.rules).string.email = true];
+    google.protobuf.StringValue writer = 10 [(validate.rules).string.min_len = 3];
 }
 
 message ExistResponse {
@@ -48,15 +48,15 @@ message ListRequest {
     google.protobuf.Int32Value limit = 1 [(validate.rules).int32 = { gte: 1 lte: 100 }];
     google.protobuf.Int32Value page = 2 [(validate.rules).int32.gte = 1];
     google.protobuf.StringValue sort = 3;
-    google.protobuf.StringValue username = 4 [(validate.rules).string = {
-    min_len: 4
-    max_len: 16
-    pattern: "^[a-z0-9_-]{3,15}$"
-    max_bytes: 256
-  }];
-    google.protobuf.StringValue first_name = 5 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue last_name = 6 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue email = 7 [(validate.rules).string.email = true]; // Not Working
+    google.protobuf.StringValue board_id = 4 [(validate.rules).string.uuid = true];
+    google.protobuf.StringValue title = 5 [(validate.rules).string.min_len = 2];
+    google.protobuf.StringValue slug = 6 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue category = 7 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue password = 8 [(validate.rules).string.min_len = 5];
+    repeated string tags = 9 [(validate.rules).repeated = {min_items: 0, max_items: 20}];
+    google.protobuf.StringValue content = 10 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue email = 11 [(validate.rules).string.email = true];
+    google.protobuf.StringValue writer = 12 [(validate.rules).string.min_len = 3];
 }
 
 message ListResponse {
@@ -67,15 +67,15 @@ message ListResponse {
 
 message GetRequest {
     google.protobuf.StringValue id = 1 [(validate.rules).string.uuid = true]; // Not Working
-    google.protobuf.StringValue username = 2 [(validate.rules).string = {
-    min_len: 4
-    max_len: 16
-    pattern: "^[a-z0-9_-]{3,15}$"
-    max_bytes: 256
-  }];
-    google.protobuf.StringValue first_name = 3 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue last_name = 4 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue email = 5 [(validate.rules).string.email = true]; // Not Working
+    google.protobuf.StringValue board_id = 2 [(validate.rules).string.uuid = true];
+    google.protobuf.StringValue title = 3 [(validate.rules).string.min_len = 2];
+    google.protobuf.StringValue slug = 4 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue category = 5 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue password = 6 [(validate.rules).string.min_len = 5];
+    repeated string tags = 7 [(validate.rules).repeated = {min_items: 0, max_items: 20}];
+    google.protobuf.StringValue content = 8 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue email = 9 [(validate.rules).string.email = true];
+    google.protobuf.StringValue writer = 10 [(validate.rules).string.min_len = 3];
 }
 
 message GetResponse {
@@ -85,15 +85,15 @@ message GetResponse {
 }
 
 message CreateRequest {
-    google.protobuf.StringValue username = 2 [(validate.rules).string = {
-    min_len: 4
-    max_len: 16
-    pattern: "^[a-z0-9_-]{3,15}$"
-    max_bytes: 256
-  }];
-    google.protobuf.StringValue first_name = 3 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue last_name = 4 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue email = 5 [(validate.rules).string.email = true]; // Not Working
+    google.protobuf.StringValue board_id = 2 [(validate.rules).string.uuid = true];
+    google.protobuf.StringValue title = 3 [(validate.rules).string.min_len = 2];
+    google.protobuf.StringValue slug = 4 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue category = 5 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue password = 6 [(validate.rules).string.min_len = 5];
+    repeated string tags = 7 [(validate.rules).repeated = {min_items: 0, max_items: 20}];
+    google.protobuf.StringValue content = 8 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue email = 9 [(validate.rules).string.email = true];
+    google.protobuf.StringValue writer = 10 [(validate.rules).string.min_len = 3];
 }
 
 message CreateResponse {
@@ -103,15 +103,15 @@ message CreateResponse {
 
 message UpdateRequest {
     google.protobuf.StringValue id = 1 [(validate.rules).string.uuid = true]; // Not Working
-    google.protobuf.StringValue username = 2 [(validate.rules).string = {
-    min_len: 4
-    max_len: 16
-    pattern: "^[a-z0-9_-]{3,15}$"
-    max_bytes: 256
-  }];
-    google.protobuf.StringValue first_name = 3 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue last_name = 4 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue email = 5 [(validate.rules).string.email = true]; // Not Working
+    google.protobuf.StringValue board_id = 2 [(validate.rules).string.uuid = true];
+    google.protobuf.StringValue title = 3 [(validate.rules).string.min_len = 2];
+    google.protobuf.StringValue slug = 4 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue category = 5 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue password = 6 [(validate.rules).string.min_len = 5];
+    repeated string tags = 7 [(validate.rules).repeated = {min_items: 0, max_items: 20}];
+    google.protobuf.StringValue content = 8 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue email = 9 [(validate.rules).string.email = true];
+    google.protobuf.StringValue writer = 10 [(validate.rules).string.min_len = 3];
 }
 
 message UpdateResponse {
@@ -121,15 +121,15 @@ message UpdateResponse {
 
 message DeleteRequest {
     google.protobuf.StringValue id = 1 [(validate.rules).string.uuid = true]; // Not Working
-    google.protobuf.StringValue username = 2 [(validate.rules).string = {
-    min_len: 4
-    max_len: 16
-    pattern: "^[a-z0-9_-]{3,15}$"
-    max_bytes: 256
-  }];
-    google.protobuf.StringValue first_name = 3 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue last_name = 4 [(validate.rules).string.min_len = 3];
-    google.protobuf.StringValue email = 5 [(validate.rules).string.email = true]; // Not Working
+    google.protobuf.StringValue board_id = 2 [(validate.rules).string.uuid = true];
+    google.protobuf.StringValue title = 3 [(validate.rules).string.min_len = 2];
+    google.protobuf.StringValue slug = 4 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue category = 5 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue password = 6 [(validate.rules).string.min_len = 5];
+    repeated string tags = 7 [(validate.rules).repeated = {min_items: 0, max_items: 20}];
+    google.protobuf.StringValue content = 8 [(validate.rules).string.min_len = 3];
+    google.protobuf.StringValue email = 9 [(validate.rules).string.email = true];
+    google.protobuf.StringValue writer = 10 [(validate.rules).string.min_len = 3];
 }
 
 message DeleteResponse {

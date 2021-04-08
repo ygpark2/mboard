@@ -2,256 +2,184 @@ package handler
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"math"
-	"time"
 
+	"github.com/jinzhu/gorm"
+	"github.com/micro/micro/v3/service"
+	"github.com/micro/micro/v3/service/auth"
 	"github.com/micro/micro/v3/service/errors"
 	"github.com/micro/micro/v3/service/logger"
-	"github.com/micro/micro/v3/service/store"
+	uuid "github.com/satori/go.uuid"
+	"github.com/thoas/go-funk"
 
-	"github.com/gosimple/slug"
-	pb "github.com/micro/services/blog/posts/proto/posts"
-	posts "github.com/micro/services/blog/posts/proto/posts"
-	tags "github.com/micro/services/blog/tags/proto"
+	post_entities "github.com/ygpark2/mboard/service/post/proto/entities"
+	postPB "github.com/ygpark2/mboard/service/post/proto/post"
+	"github.com/ygpark2/mboard/service/post/repository"
+	myErrors "github.com/ygpark2/mboard/shared/errors"
 )
 
-const (
-	tagType         = "post-tag"
-	slugPrefix      = "slug"
-	idPrefix        = "id"
-	timeStampPrefix = "timestamp"
-)
-
-type Post struct {
-	ID              string   `json:"id"`
-	Title           string   `json:"title"`
-	Slug            string   `json:"slug"`
-	Content         string   `json:"content"`
-	CreateTimestamp int64    `json:"create_timestamp"`
-	UpdateTimestamp int64    `json:"update_timestamp"`
-	TagNames        []string `json:"tagNames"`
-}
-
+// Posts struct
 type Posts struct {
-	Tags tags.TagsService
+	postRepository repository.PostRepository
+	event          *service.Event
 }
 
-func (p *Posts) Save(ctx context.Context, req *posts.SaveRequest, rsp *posts.SaveResponse) error {
-	if len(req.Post.Id) == 0 || len(req.Post.Title) == 0 || len(req.Post.Content) == 0 {
-		return errors.BadRequest("posts.save.input-check", "Id, title or content is missing")
+// NewPosts returns an instance of `PostServiceHandler`.
+func NewPosts(repo repository.PostRepository, eve *service.Event) postPB.PostServiceHandler {
+	return &Posts{
+		postRepository: repo,
+		event:          eve,
 	}
-
-	// read by post
-	records, err := store.Read(fmt.Sprintf("%v:%v", idPrefix, req.Post.Id))
-	if err != nil && err != store.ErrNotFound {
-		return errors.InternalServerError("posts.save.store-id-read", "Failed to read post by id: %v", err.Error())
-	}
-	postSlug := slug.Make(req.Post.Title)
-	// If no existing record is found, create a new one
-	if len(records) == 0 {
-		post := &Post{
-			ID:              req.Post.Id,
-			Title:           req.Post.Title,
-			Content:         req.Post.Content,
-			TagNames:        req.Post.TagNames,
-			Slug:            postSlug,
-			CreateTimestamp: time.Now().Unix(),
-		}
-		err := p.savePost(ctx, nil, post)
-		if err != nil {
-			return errors.InternalServerError("posts.save.post-save", "Failed to save new post: %v", err.Error())
-		}
-		return nil
-	}
-	record := records[0]
-	oldPost := &Post{}
-	err = json.Unmarshal(record.Value, oldPost)
-	if err != nil {
-		return errors.InternalServerError("posts.save.unmarshal", "Failed to unmarshal old post: %v", err.Error())
-	}
-	post := &Post{
-		ID:              req.Post.Id,
-		Title:           req.Post.Title,
-		Content:         req.Post.Content,
-		Slug:            postSlug,
-		TagNames:        req.Post.TagNames,
-		CreateTimestamp: oldPost.CreateTimestamp,
-		UpdateTimestamp: time.Now().Unix(),
-	}
-
-	// Check if slug exists
-	recordsBySlug, err := store.Read(fmt.Sprintf("%v:%v", slugPrefix, postSlug))
-	if err != nil && err != store.ErrNotFound {
-		return errors.InternalServerError("posts.save.store-read", "Failed to read post by slug: %v", err.Error())
-	}
-	otherSlugPost := &Post{}
-	err = json.Unmarshal(record.Value, otherSlugPost)
-	if err != nil {
-		return errors.InternalServerError("posts.save.slug-unmarshal", "Error unmarshaling other post with same slug: %v", err.Error())
-	}
-	if len(recordsBySlug) > 0 && oldPost.ID != otherSlugPost.ID {
-		return errors.BadRequest("posts.save.slug-check", "An other post with this slug already exists")
-	}
-
-	return p.savePost(ctx, oldPost, post)
 }
 
-func (p *Posts) savePost(ctx context.Context, oldPost, post *Post) error {
-	bytes, err := json.Marshal(post)
-	if err != nil {
-		return err
-	}
+func (h *Posts) Exist(ctx context.Context, req *postPB.ExistRequest, rsp *postPB.ExistResponse) error {
+	logger.Info("Received Posts.Exist request")
+	model := post_entities.PostORM{}
+	model.Id = uuid.FromStringOrNil(req.Id.GetValue())
+	model.BoardId = 
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	order := req.Order.GetValue()
+	model.Order = &order
+	search := req.Search.GetValue()
+	model.Search = &search
 
-	err = store.Write(&store.Record{
-		Key:   fmt.Sprintf("%v:%v", idPrefix, post.ID),
-		Value: bytes,
-	})
-	if err != nil {
-		return err
-	}
-	// Delete old slug index if the slug has changed
-	if oldPost != nil && oldPost.Slug != post.Slug {
-		err = store.Delete(fmt.Sprintf("%v:%v", slugPrefix, post.Slug))
-		if err != nil {
-			return err
-		}
-	}
-	err = store.Write(&store.Record{
-		Key:   fmt.Sprintf("%v:%v", slugPrefix, post.Slug),
-		Value: bytes,
-	})
-	if err != nil {
-		return err
-	}
-	err = store.Write(&store.Record{
-		Key:   fmt.Sprintf("%v:%v", timeStampPrefix, math.MaxInt64-post.CreateTimestamp),
-		Value: bytes,
-	})
-	if err != nil {
-		return err
-	}
-	if oldPost == nil {
-		for _, tagName := range post.TagNames {
-			_, err := p.Tags.IncreaseCount(ctx, &tags.IncreaseCountRequest{
-				ParentID: post.ID,
-				Type:     tagType,
-				Title:    tagName,
-			})
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	}
-	return p.diffTags(ctx, post.ID, oldPost.TagNames, post.TagNames)
-}
-
-func (p *Posts) diffTags(ctx context.Context, parentID string, oldTagNames, newTagNames []string) error {
-	oldTags := map[string]struct{}{}
-	for _, v := range oldTagNames {
-		oldTags[v] = struct{}{}
-	}
-	newTags := map[string]struct{}{}
-	for _, v := range newTagNames {
-		newTags[v] = struct{}{}
-	}
-	for i := range oldTags {
-		_, stillThere := newTags[i]
-		if !stillThere {
-			_, err := p.Tags.DecreaseCount(ctx, &tags.DecreaseCountRequest{
-				ParentID: parentID,
-				Type:     tagType,
-				Title:    i,
-			})
-			if err != nil {
-				logger.Errorf("Error decreasing count for tag '%v' with type '%v' for parent '%v'", i, tagType, parentID)
-			}
-		}
-	}
-	for i := range newTags {
-		_, newlyAdded := oldTags[i]
-		if newlyAdded {
-			_, err := p.Tags.IncreaseCount(ctx, &tags.IncreaseCountRequest{
-				ParentID: parentID,
-				Type:     tagType,
-				Title:    i,
-			})
-			if err != nil {
-				logger.Errorf("Error increasing count for tag '%v' with type '%v' for parent '%v'", i, tagType, parentID)
-			}
-		}
-	}
+	exists := h.postRepository.Exist(&model)
+	logger.Info("user exists? %t", exists)
+	rsp.Result = exists
 	return nil
 }
 
-func (p *Posts) Query(ctx context.Context, req *pb.QueryRequest, rsp *pb.QueryResponse) error {
-	var records []*store.Record
-	var err error
-	if len(req.Slug) > 0 {
-		key := fmt.Sprintf("%v:%v", slugPrefix, req.Slug)
-		logger.Infof("Reading post by slug: %v", req.Slug)
-		records, err = store.Read("", store.Prefix(key))
-	} else {
-		key := fmt.Sprintf("%v:", timeStampPrefix)
-		var limit uint
-		limit = 20
-		if req.Limit > 0 {
-			limit = uint(req.Limit)
-		}
-		logger.Infof("Listing posts, offset: %v, limit: %v", req.Offset, limit)
-		records, err = store.Read("", store.Prefix(key),
-			store.Offset(uint(req.Offset)),
-			store.Limit(limit))
-	}
+func (h *Posts) List(ctx context.Context, req *postPB.ListRequest, rsp *postPB.ListResponse) error {
+	logger.Info("Received Posts.List request")
+	model := post_entities.PostORM{}
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	model.Description = req.Description
+	model.Notices = req.Notices
+	model.Order = &req.Order.Value
+	model.Search = &req.Search.Value
 
+	total, posts, err := h.postRepository.List(int(req.Limit.GetValue()), int(req.Page.GetValue()), req.Sort.GetValue(), &model)
 	if err != nil {
-		return errors.BadRequest("posts.query.store-read", "Failed to read from store: %v", err.Error())
+		return errors.NotFound("mkit.service.post.list", "Error %v", err.Error())
 	}
-	rsp.Posts = make([]*pb.Post, len(records))
-	for i, record := range records {
-		postRecord := &Post{}
-		err := json.Unmarshal(record.Value, postRecord)
-		if err != nil {
-			return errors.InternalServerError("posts.save.unmarshal", "Failed to unmarshal old post: %v", err.Error())
-		}
-		rsp.Posts[i] = &pb.Post{
-			Id:       postRecord.ID,
-			Title:    postRecord.Title,
-			Slug:     postRecord.Slug,
-			Content:  postRecord.Content,
-			TagNames: postRecord.TagNames,
-		}
-	}
+	rsp.Total = total
+
+	// newBoards := make([]*accountPB.User, len(boards))
+	// for index, board := range boards {
+	// 	tmpBoard, _ := board.ToPB(ctx)
+	// 	newBoards[index] = &tmpBoard
+	// 	// *newBoards[index], _ = board.ToPB(ctx) ???
+	// }
+	newPosts := funk.Map(posts, func(post *post_entities.PostORM) *post_entities.Post {
+		tmpPost, _ := post.ToPB(ctx)
+		return &tmpPost
+	}).([]*post_entities.Post)
+
+	rsp.Results = newPosts
 	return nil
 }
 
-func (p *Posts) Delete(ctx context.Context, req *pb.DeleteRequest, rsp *pb.DeleteResponse) error {
-	logger.Info("Received Post.Delete request")
-	records, err := store.Read(fmt.Sprintf("%v:%v", idPrefix, req.Id))
-	if err != nil && err != store.ErrNotFound {
-		return err
+func (h *Posts) Get(ctx context.Context, req *postPB.GetRequest, rsp *postPB.GetResponse) error {
+	logger.Info("Received Posts.Get request")
+
+	id := req.Id.GetValue()
+	if id == "" {
+		return myErrors.ValidationError("mkit.service.post.get", "validation error: Missing Id")
 	}
-	if len(records) == 0 {
-		return fmt.Errorf("Post with ID %v not found", req.Id)
-	}
-	post := &Post{}
-	err = json.Unmarshal(records[0].Value, post)
+	post, err := h.postRepository.Get(id)
 	if err != nil {
-		return err
+		if err == gorm.ErrRecordNotFound {
+			rsp.Result = nil
+			return nil
+		}
+		return myErrors.AppError(myErrors.DBE, err)
 	}
 
-	// Delete by ID
-	err = store.Delete(fmt.Sprintf("%v:%v", idPrefix, post.ID))
-	if err != nil {
-		return err
+	tempPost, _ := post.ToPB(ctx)
+	rsp.Result = &tempPost
+
+	return nil
+}
+
+func (h *Posts) Create(ctx context.Context, req *postPB.CreateRequest, rsp *postPB.CreateResponse) error {
+	logger.Info("Received Posts.Create request")
+
+	model := post_entities.PostORM{}
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	model.Description = req.Description
+	model.Notices = req.Notices
+	model.Order = &req.Order.Value
+	model.Search = &req.Search.Value
+
+	if err := h.postRepository.Create(&model); err != nil {
+		return myErrors.AppError(myErrors.DBE, err)
 	}
-	// Delete by slug
-	err = store.Delete(fmt.Sprintf("%v:%v", slugPrefix, post.Slug))
-	if err != nil {
-		return err
+
+	// send email (TODO: async `go h.Event.Publish(...)`)
+	/*
+		if err := events.Publish(ctx, &emailerPB.Message{To: req.Email.GetValue()}); err != nil {
+			log.Error().Err(err).Msg("Received Event.Publish request error")
+			return myErrors.AppError(myErrors.PSE, err)
+		}
+	*/
+
+	return nil
+}
+
+func (h *Posts) Update(ctx context.Context, req *postPB.UpdateRequest, rsp *postPB.UpdateResponse) error {
+	logger.Info("Received Posts.Update request")
+	// Identify the user
+	acc, ok := auth.AccountFromContext(ctx)
+	if !ok {
+		return errors.Unauthorized("mkit.service.post.update", "A valid auth token is required")
 	}
-	// Delete by timeStamp
-	return store.Delete(fmt.Sprintf("%v:%v", timeStampPrefix, post.CreateTimestamp))
+	logger.Info("Caller Account: %v", acc)
+
+	id := req.Id.GetValue()
+	if id == "" {
+		return myErrors.ValidationError("mkit.service.post.update", "validation error: Missing Id")
+	}
+
+	model := post_entities.PostORM{}
+	model.BoardId = req
+	title := req.Title.GetValue()
+	model.Title = &title
+	mobileTitle := req.MobileTitle.GetValue()
+	model.MobileTitle = &mobileTitle
+	model.Description = req.Description
+	model.Notices = req.Notices
+	model.Order = &req.Order.Value
+	model.Search = &req.Search.Value
+
+	if err := h.postRepository.Update(id, &model); err != nil {
+		return myErrors.AppError(myErrors.DBE, err)
+	}
+
+	return nil
+}
+
+func (h *Posts) Delete(ctx context.Context, req *postPB.DeleteRequest, rsp *postPB.DeleteResponse) error {
+	logger.Info("Received Posts.Delete request")
+
+	id := req.Id.GetValue()
+	if id == "" {
+		return myErrors.ValidationError("mkit.service.post.update", "validation error: Missing Id")
+	}
+
+	model := post_entities.PostORM{}
+	model.Id = uuid.FromStringOrNil(id)
+
+	if err := h.postRepository.Delete(&model); err != nil {
+		return myErrors.AppError(myErrors.DBE, err)
+	}
+
+	return nil
 }

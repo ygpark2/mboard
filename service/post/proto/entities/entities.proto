@@ -35,13 +35,15 @@ message Post {
     google.protobuf.Timestamp deleted_at = 4 [(gorm.field).tag = { index: "idx_posts_deleted_at" }];
     google.protobuf.StringValue board_id = 5 [(gorm.field).tag = { index: "idx_posts_board", not_null: true }];
     google.protobuf.StringValue title = 6 [(gorm.field).tag = { not_null: true }];
-    google.protobuf.StringValue category = 7 [(gorm.field).tag = { not_null: true }];
-    google.protobuf.StringValue password = 8 [(gorm.field).tag = { not_null: false }];
-    string content = 9 [(gorm.field).tag = { not_null: true }];
-    string email = 10 [(gorm.field).tag = { not_null: true }];
-    string writer = 11 [(gorm.field).tag = { not_null: true }];
-    uint32 comment_counts = 12 [(gorm.field).drop = true];
-    uint32 read_counts = 13 [(gorm.field).drop = true];
-    uint32 up_vote_counts = 14 [(gorm.field).drop = true];
-    uint32 down_vote_counts = 15 [(gorm.field).drop = true];
+    google.protobuf.StringValue slug = 7 [(gorm.field).tag = { not_null: true }];
+    google.protobuf.StringValue category = 8 [(gorm.field).tag = { not_null: true }];
+    google.protobuf.StringValue password = 9 [(gorm.field).tag = { not_null: false }];
+    repeated string tags = 10 [(gorm.field).tag = { not_null: false }];
+    string content = 11 [(gorm.field).tag = { not_null: true }];
+    string email = 12 [(gorm.field).tag = { not_null: true }];
+    string writer = 13 [(gorm.field).tag = { not_null: true }];
+    uint32 comment_counts = 14 [(gorm.field).drop = true];
+    uint32 read_counts = 15 [(gorm.field).drop = true];
+    uint32 up_vote_counts = 16 [(gorm.field).drop = true];
+    uint32 down_vote_counts = 17 [(gorm.field).drop = true];
 }
