@@ -35,7 +35,7 @@ func (h *Posts) Exist(ctx context.Context, req *postPB.ExistRequest, rsp *postPB
 	logger.Info("Received Posts.Exist request")
 	model := post_entities.PostORM{}
 	model.Id = uuid.FromStringOrNil(req.Id.GetValue())
-	model.BoardId = 
+	model.BoardId = req.BoardId.GetValue()
 	title := req.Title.GetValue()
 	model.Title = &title
 	mobileTitle := req.MobileTitle.GetValue()

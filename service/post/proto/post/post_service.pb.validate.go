@@ -56,47 +56,74 @@ func (m *ExistRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
+	if wrapper := m.GetBoardId(); wrapper != nil {
 
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
+		if err := m._validateUuid(wrapper.GetValue()); err != nil {
 			return ExistRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return ExistRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_ExistRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return ExistRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
+				field:  "BoardId",
+				reason: "value must be a valid UUID",
+				cause:  err,
 			}
 		}
 
 	}
 
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
+			return ExistRequestValidationError{
+				field:  "Title",
+				reason: "value length must be at least 2 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ExistRequestValidationError{
-				field:  "FirstName",
+				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ExistRequestValidationError{
-				field:  "LastName",
+				field:  "Category",
+				reason: "value length must be at least 3 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetPassword(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
+			return ExistRequestValidationError{
+				field:  "Password",
+				reason: "value length must be at least 5 runes",
+			}
+		}
+
+	}
+
+	if len(m.GetTags()) > 20 {
+		return ExistRequestValidationError{
+			field:  "Tags",
+			reason: "value must contain no more than 20 item(s)",
+		}
+	}
+
+	if wrapper := m.GetContent(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return ExistRequestValidationError{
+				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
 		}
@@ -110,6 +137,17 @@ func (m *ExistRequest) Validate() error {
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
+			}
+		}
+
+	}
+
+	if wrapper := m.GetWriter(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return ExistRequestValidationError{
+				field:  "Writer",
+				reason: "value length must be at least 3 runes",
 			}
 		}
 
@@ -230,8 +268,6 @@ var _ interface {
 	ErrorName() string
 } = ExistRequestValidationError{}
 
-var _ExistRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
-
 // Validate is disabled for ExistResponse. This method will always return nil.
 func (m *ExistResponse) Validate() error {
 	return nil
@@ -331,47 +367,74 @@ func (m *ListRequest) Validate() error {
 		}
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
+	if wrapper := m.GetBoardId(); wrapper != nil {
 
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
+		if err := m._validateUuid(wrapper.GetValue()); err != nil {
 			return ListRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return ListRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_ListRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return ListRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
+				field:  "BoardId",
+				reason: "value must be a valid UUID",
+				cause:  err,
 			}
 		}
 
 	}
 
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
+			return ListRequestValidationError{
+				field:  "Title",
+				reason: "value length must be at least 2 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ListRequestValidationError{
-				field:  "FirstName",
+				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return ListRequestValidationError{
-				field:  "LastName",
+				field:  "Category",
+				reason: "value length must be at least 3 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetPassword(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
+			return ListRequestValidationError{
+				field:  "Password",
+				reason: "value length must be at least 5 runes",
+			}
+		}
+
+	}
+
+	if len(m.GetTags()) > 20 {
+		return ListRequestValidationError{
+			field:  "Tags",
+			reason: "value must contain no more than 20 item(s)",
+		}
+	}
+
+	if wrapper := m.GetContent(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return ListRequestValidationError{
+				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
 		}
@@ -385,6 +448,17 @@ func (m *ListRequest) Validate() error {
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
+			}
+		}
+
+	}
+
+	if wrapper := m.GetWriter(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return ListRequestValidationError{
+				field:  "Writer",
+				reason: "value length must be at least 3 runes",
 			}
 		}
 
@@ -443,6 +517,14 @@ func (m *ListRequest) _validateEmail(addr string) error {
 	return m._validateHostname(parts[1])
 }
 
+func (m *ListRequest) _validateUuid(uuid string) error {
+	if matched := _post_service_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
 // ListRequestValidationError is the validation error returned by
 // ListRequest.Validate if the designated constraints aren't met.
 type ListRequestValidationError struct {
@@ -496,8 +578,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ListRequestValidationError{}
-
-var _ListRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for ListResponse. This method will always return nil.
 func (m *ListResponse) Validate() error {
@@ -577,47 +657,74 @@ func (m *GetRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
+	if wrapper := m.GetBoardId(); wrapper != nil {
 
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
+		if err := m._validateUuid(wrapper.GetValue()); err != nil {
 			return GetRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return GetRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_GetRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return GetRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
+				field:  "BoardId",
+				reason: "value must be a valid UUID",
+				cause:  err,
 			}
 		}
 
 	}
 
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
+			return GetRequestValidationError{
+				field:  "Title",
+				reason: "value length must be at least 2 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return GetRequestValidationError{
-				field:  "FirstName",
+				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return GetRequestValidationError{
-				field:  "LastName",
+				field:  "Category",
+				reason: "value length must be at least 3 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetPassword(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
+			return GetRequestValidationError{
+				field:  "Password",
+				reason: "value length must be at least 5 runes",
+			}
+		}
+
+	}
+
+	if len(m.GetTags()) > 20 {
+		return GetRequestValidationError{
+			field:  "Tags",
+			reason: "value must contain no more than 20 item(s)",
+		}
+	}
+
+	if wrapper := m.GetContent(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return GetRequestValidationError{
+				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
 		}
@@ -631,6 +738,17 @@ func (m *GetRequest) Validate() error {
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
+			}
+		}
+
+	}
+
+	if wrapper := m.GetWriter(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return GetRequestValidationError{
+				field:  "Writer",
+				reason: "value length must be at least 3 runes",
 			}
 		}
 
@@ -751,8 +869,6 @@ var _ interface {
 	ErrorName() string
 } = GetRequestValidationError{}
 
-var _GetRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
-
 // Validate is disabled for GetResponse. This method will always return nil.
 func (m *GetResponse) Validate() error {
 	return nil
@@ -820,47 +936,74 @@ func (m *CreateRequest) Validate() error {
 		return nil
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
+	if wrapper := m.GetBoardId(); wrapper != nil {
 
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
+		if err := m._validateUuid(wrapper.GetValue()); err != nil {
 			return CreateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return CreateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_CreateRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return CreateRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
+				field:  "BoardId",
+				reason: "value must be a valid UUID",
+				cause:  err,
 			}
 		}
 
 	}
 
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
+			return CreateRequestValidationError{
+				field:  "Title",
+				reason: "value length must be at least 2 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return CreateRequestValidationError{
-				field:  "FirstName",
+				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return CreateRequestValidationError{
-				field:  "LastName",
+				field:  "Category",
+				reason: "value length must be at least 3 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetPassword(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
+			return CreateRequestValidationError{
+				field:  "Password",
+				reason: "value length must be at least 5 runes",
+			}
+		}
+
+	}
+
+	if len(m.GetTags()) > 20 {
+		return CreateRequestValidationError{
+			field:  "Tags",
+			reason: "value must contain no more than 20 item(s)",
+		}
+	}
+
+	if wrapper := m.GetContent(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return CreateRequestValidationError{
+				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
 		}
@@ -874,6 +1017,17 @@ func (m *CreateRequest) Validate() error {
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
+			}
+		}
+
+	}
+
+	if wrapper := m.GetWriter(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return CreateRequestValidationError{
+				field:  "Writer",
+				reason: "value length must be at least 3 runes",
 			}
 		}
 
@@ -932,6 +1086,14 @@ func (m *CreateRequest) _validateEmail(addr string) error {
 	return m._validateHostname(parts[1])
 }
 
+func (m *CreateRequest) _validateUuid(uuid string) error {
+	if matched := _post_service_uuidPattern.MatchString(uuid); !matched {
+		return errors.New("invalid uuid format")
+	}
+
+	return nil
+}
+
 // CreateRequestValidationError is the validation error returned by
 // CreateRequest.Validate if the designated constraints aren't met.
 type CreateRequestValidationError struct {
@@ -985,8 +1147,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateRequestValidationError{}
-
-var _CreateRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for CreateResponse. This method will always return nil.
 func (m *CreateResponse) Validate() error {
@@ -1067,47 +1227,74 @@ func (m *UpdateRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
+	if wrapper := m.GetBoardId(); wrapper != nil {
 
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
+		if err := m._validateUuid(wrapper.GetValue()); err != nil {
 			return UpdateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return UpdateRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_UpdateRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return UpdateRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
+				field:  "BoardId",
+				reason: "value must be a valid UUID",
+				cause:  err,
 			}
 		}
 
 	}
 
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
+			return UpdateRequestValidationError{
+				field:  "Title",
+				reason: "value length must be at least 2 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return UpdateRequestValidationError{
-				field:  "FirstName",
+				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return UpdateRequestValidationError{
-				field:  "LastName",
+				field:  "Category",
+				reason: "value length must be at least 3 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetPassword(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
+			return UpdateRequestValidationError{
+				field:  "Password",
+				reason: "value length must be at least 5 runes",
+			}
+		}
+
+	}
+
+	if len(m.GetTags()) > 20 {
+		return UpdateRequestValidationError{
+			field:  "Tags",
+			reason: "value must contain no more than 20 item(s)",
+		}
+	}
+
+	if wrapper := m.GetContent(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return UpdateRequestValidationError{
+				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
 		}
@@ -1121,6 +1308,17 @@ func (m *UpdateRequest) Validate() error {
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
+			}
+		}
+
+	}
+
+	if wrapper := m.GetWriter(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return UpdateRequestValidationError{
+				field:  "Writer",
+				reason: "value length must be at least 3 runes",
 			}
 		}
 
@@ -1241,8 +1439,6 @@ var _ interface {
 	ErrorName() string
 } = UpdateRequestValidationError{}
 
-var _UpdateRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
-
 // Validate is disabled for UpdateResponse. This method will always return nil.
 func (m *UpdateResponse) Validate() error {
 	return nil
@@ -1322,47 +1518,74 @@ func (m *DeleteRequest) Validate() error {
 
 	}
 
-	if wrapper := m.GetUsername(); wrapper != nil {
+	if wrapper := m.GetBoardId(); wrapper != nil {
 
-		if l := utf8.RuneCountInString(wrapper.GetValue()); l < 4 || l > 16 {
+		if err := m._validateUuid(wrapper.GetValue()); err != nil {
 			return DeleteRequestValidationError{
-				field:  "Username",
-				reason: "value length must be between 4 and 16 runes, inclusive",
-			}
-		}
-
-		if len(wrapper.GetValue()) > 256 {
-			return DeleteRequestValidationError{
-				field:  "Username",
-				reason: "value length must be at most 256 bytes",
-			}
-		}
-
-		if !_DeleteRequest_Username_Pattern.MatchString(wrapper.GetValue()) {
-			return DeleteRequestValidationError{
-				field:  "Username",
-				reason: "value does not match regex pattern \"^[a-z0-9_-]{3,15}$\"",
+				field:  "BoardId",
+				reason: "value must be a valid UUID",
+				cause:  err,
 			}
 		}
 
 	}
 
-	if wrapper := m.GetFirstName(); wrapper != nil {
+	if wrapper := m.GetTitle(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
+			return DeleteRequestValidationError{
+				field:  "Title",
+				reason: "value length must be at least 2 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return DeleteRequestValidationError{
-				field:  "FirstName",
+				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
 		}
 
 	}
 
-	if wrapper := m.GetLastName(); wrapper != nil {
+	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
 			return DeleteRequestValidationError{
-				field:  "LastName",
+				field:  "Category",
+				reason: "value length must be at least 3 runes",
+			}
+		}
+
+	}
+
+	if wrapper := m.GetPassword(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
+			return DeleteRequestValidationError{
+				field:  "Password",
+				reason: "value length must be at least 5 runes",
+			}
+		}
+
+	}
+
+	if len(m.GetTags()) > 20 {
+		return DeleteRequestValidationError{
+			field:  "Tags",
+			reason: "value must contain no more than 20 item(s)",
+		}
+	}
+
+	if wrapper := m.GetContent(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return DeleteRequestValidationError{
+				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
 		}
@@ -1376,6 +1599,17 @@ func (m *DeleteRequest) Validate() error {
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
+			}
+		}
+
+	}
+
+	if wrapper := m.GetWriter(); wrapper != nil {
+
+		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
+			return DeleteRequestValidationError{
+				field:  "Writer",
+				reason: "value length must be at least 3 runes",
 			}
 		}
 
@@ -1495,8 +1729,6 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteRequestValidationError{}
-
-var _DeleteRequest_Username_Pattern = regexp.MustCompile("^[a-z0-9_-]{3,15}$")
 
 // Validate is disabled for DeleteResponse. This method will always return nil.
 func (m *DeleteResponse) Validate() error {
