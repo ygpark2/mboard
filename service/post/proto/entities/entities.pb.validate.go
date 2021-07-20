@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,16 +30,38 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
-
-// define the regex for a UUID once up-front
-var _entities_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
 // Validate is disabled for Post. This method will always return nil.
 func (m *Post) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for Post. This method will always return nil.
+func (m *Post) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *Post) validate(all bool) error {
 	return nil
 }
+
+// PostMultiError is an error wrapping multiple validation errors returned by
+// Post.ValidateAll() if the designated constraints aren't met.
+type PostMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PostMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PostMultiError) AllErrors() []error { return m }
 
 // PostValidationError is the validation error returned by Post.Validate if the
 // designated constraints aren't met.

@@ -1,7 +1,8 @@
 package registry
 
 import (
-	"github.com/jinzhu/gorm"
+	// "github.com/jinzhu/gorm"
+	"github.com/go-gorm/gorm"
 	"github.com/sarulabs/di/v2"
 
 	"github.com/rs/zerolog/log"

@@ -1,7 +1,8 @@
 package repository
 
 import (
-	"github.com/jinzhu/gorm"
+	// "github.com/jinzhu/gorm"
+	"github.com/go-gorm/gorm"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"

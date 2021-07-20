@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,16 +30,38 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
-
-// define the regex for a UUID once up-front
-var _transaction_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
 // Validate is disabled for ReadRequest. This method will always return nil.
 func (m *ReadRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for ReadRequest. This method will always return nil.
+func (m *ReadRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ReadRequest) validate(all bool) error {
 	return nil
 }
+
+// ReadRequestMultiError is an error wrapping multiple validation errors
+// returned by ReadRequest.ValidateAll() if the designated constraints aren't met.
+type ReadRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ReadRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ReadRequestMultiError) AllErrors() []error { return m }
 
 // ReadRequestValidationError is the validation error returned by
 // ReadRequest.Validate if the designated constraints aren't met.
@@ -97,8 +119,33 @@ var _ interface {
 
 // Validate is disabled for WriteRequest. This method will always return nil.
 func (m *WriteRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for WriteRequest. This method will always return nil.
+func (m *WriteRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *WriteRequest) validate(all bool) error {
 	return nil
 }
+
+// WriteRequestMultiError is an error wrapping multiple validation errors
+// returned by WriteRequest.ValidateAll() if the designated constraints aren't met.
+type WriteRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m WriteRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m WriteRequestMultiError) AllErrors() []error { return m }
 
 // WriteRequestValidationError is the validation error returned by
 // WriteRequest.Validate if the designated constraints aren't met.
@@ -155,19 +202,53 @@ var _ interface {
 } = WriteRequestValidationError{}
 
 // Validate checks the field values on TransactionEvent with the rules defined
-// in the proto definition for this message. If any rules are violated, an
-// error is returned.
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
 func (m *TransactionEvent) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TransactionEvent with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TransactionEventMultiError, or nil if none found.
+func (m *TransactionEvent) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TransactionEvent) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
+
+	var errors []error
 
 	// no validation rules for Req
 
 	// no validation rules for Rsp
 
+	if len(errors) > 0 {
+		return TransactionEventMultiError(errors)
+	}
 	return nil
 }
+
+// TransactionEventMultiError is an error wrapping multiple validation errors
+// returned by TransactionEvent.ValidateAll() if the designated constraints
+// aren't met.
+type TransactionEventMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TransactionEventMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TransactionEventMultiError) AllErrors() []error { return m }
 
 // TransactionEventValidationError is the validation error returned by
 // TransactionEvent.Validate if the designated constraints aren't met.

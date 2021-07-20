@@ -6,7 +6,8 @@ import (
 
 	// "github.com/golang/protobuf/ptypes"
 
-	"github.com/jinzhu/gorm"
+	// "github.com/jinzhu/gorm"
+	"github.com/go-gorm/gorm"
 	"github.com/thoas/go-funk"
 
 	ptypes1 "github.com/golang/protobuf/ptypes"

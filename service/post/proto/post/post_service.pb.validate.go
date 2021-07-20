@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,28 +30,46 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
 
 // define the regex for a UUID once up-front
 var _post_service_uuidPattern = regexp.MustCompile("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 
 // Validate checks the field values on ExistRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ExistRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExistRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ExistRequestMultiError, or
+// nil if none found.
+func (m *ExistRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExistRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if wrapper := m.GetId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return ExistRequestValidationError{
+			err = ExistRequestValidationError{
 				field:  "Id",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -59,11 +77,15 @@ func (m *ExistRequest) Validate() error {
 	if wrapper := m.GetBoardId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return ExistRequestValidationError{
+			err = ExistRequestValidationError{
 				field:  "BoardId",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -71,10 +93,14 @@ func (m *ExistRequest) Validate() error {
 	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
-			return ExistRequestValidationError{
+			err := ExistRequestValidationError{
 				field:  "Title",
 				reason: "value length must be at least 2 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -82,10 +108,14 @@ func (m *ExistRequest) Validate() error {
 	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ExistRequestValidationError{
+			err := ExistRequestValidationError{
 				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -93,10 +123,14 @@ func (m *ExistRequest) Validate() error {
 	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ExistRequestValidationError{
+			err := ExistRequestValidationError{
 				field:  "Category",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -104,28 +138,40 @@ func (m *ExistRequest) Validate() error {
 	if wrapper := m.GetPassword(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
-			return ExistRequestValidationError{
+			err := ExistRequestValidationError{
 				field:  "Password",
 				reason: "value length must be at least 5 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetTags()) > 20 {
-		return ExistRequestValidationError{
+		err := ExistRequestValidationError{
 			field:  "Tags",
 			reason: "value must contain no more than 20 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if wrapper := m.GetContent(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ExistRequestValidationError{
+			err := ExistRequestValidationError{
 				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -133,11 +179,15 @@ func (m *ExistRequest) Validate() error {
 	if wrapper := m.GetEmail(); wrapper != nil {
 
 		if err := m._validateEmail(wrapper.GetValue()); err != nil {
-			return ExistRequestValidationError{
+			err = ExistRequestValidationError{
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -145,14 +195,21 @@ func (m *ExistRequest) Validate() error {
 	if wrapper := m.GetWriter(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ExistRequestValidationError{
+			err := ExistRequestValidationError{
 				field:  "Writer",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return ExistRequestMultiError(errors)
+	}
 	return nil
 }
 
@@ -214,6 +271,22 @@ func (m *ExistRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
+// ExistRequestMultiError is an error wrapping multiple validation errors
+// returned by ExistRequest.ValidateAll() if the designated constraints aren't met.
+type ExistRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExistRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExistRequestMultiError) AllErrors() []error { return m }
+
 // ExistRequestValidationError is the validation error returned by
 // ExistRequest.Validate if the designated constraints aren't met.
 type ExistRequestValidationError struct {
@@ -270,8 +343,34 @@ var _ interface {
 
 // Validate is disabled for ExistResponse. This method will always return nil.
 func (m *ExistResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for ExistResponse. This method will always return nil.
+func (m *ExistResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExistResponse) validate(all bool) error {
 	return nil
 }
+
+// ExistResponseMultiError is an error wrapping multiple validation errors
+// returned by ExistResponse.ValidateAll() if the designated constraints
+// aren't met.
+type ExistResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExistResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExistResponseMultiError) AllErrors() []error { return m }
 
 // ExistResponseValidationError is the validation error returned by
 // ExistResponse.Validate if the designated constraints aren't met.
@@ -328,20 +427,38 @@ var _ interface {
 } = ExistResponseValidationError{}
 
 // Validate checks the field values on ListRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *ListRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in ListRequestMultiError, or
+// nil if none found.
+func (m *ListRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if wrapper := m.GetLimit(); wrapper != nil {
 
 		if val := wrapper.GetValue(); val < 1 || val > 100 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Limit",
 				reason: "value must be inside range [1, 100]",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -349,15 +466,38 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetPage(); wrapper != nil {
 
 		if wrapper.GetValue() < 1 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Page",
 				reason: "value must be greater than or equal to 1",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
-	if v, ok := interface{}(m.GetSort()).(interface{ Validate() error }); ok {
+	if all {
+		switch v := interface{}(m.GetSort()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ListRequestValidationError{
+					field:  "Sort",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ListRequestValidationError{
+					field:  "Sort",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetSort()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ListRequestValidationError{
 				field:  "Sort",
@@ -370,11 +510,15 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetBoardId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return ListRequestValidationError{
+			err = ListRequestValidationError{
 				field:  "BoardId",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -382,10 +526,14 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Title",
 				reason: "value length must be at least 2 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -393,10 +541,14 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -404,10 +556,14 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Category",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -415,28 +571,40 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetPassword(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Password",
 				reason: "value length must be at least 5 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetTags()) > 20 {
-		return ListRequestValidationError{
+		err := ListRequestValidationError{
 			field:  "Tags",
 			reason: "value must contain no more than 20 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if wrapper := m.GetContent(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -444,11 +612,15 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetEmail(); wrapper != nil {
 
 		if err := m._validateEmail(wrapper.GetValue()); err != nil {
-			return ListRequestValidationError{
+			err = ListRequestValidationError{
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -456,14 +628,21 @@ func (m *ListRequest) Validate() error {
 	if wrapper := m.GetWriter(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return ListRequestValidationError{
+			err := ListRequestValidationError{
 				field:  "Writer",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return ListRequestMultiError(errors)
+	}
 	return nil
 }
 
@@ -525,6 +704,22 @@ func (m *ListRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
+// ListRequestMultiError is an error wrapping multiple validation errors
+// returned by ListRequest.ValidateAll() if the designated constraints aren't met.
+type ListRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListRequestMultiError) AllErrors() []error { return m }
+
 // ListRequestValidationError is the validation error returned by
 // ListRequest.Validate if the designated constraints aren't met.
 type ListRequestValidationError struct {
@@ -581,8 +776,33 @@ var _ interface {
 
 // Validate is disabled for ListResponse. This method will always return nil.
 func (m *ListResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for ListResponse. This method will always return nil.
+func (m *ListResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListResponse) validate(all bool) error {
 	return nil
 }
+
+// ListResponseMultiError is an error wrapping multiple validation errors
+// returned by ListResponse.ValidateAll() if the designated constraints aren't met.
+type ListResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListResponseMultiError) AllErrors() []error { return m }
 
 // ListResponseValidationError is the validation error returned by
 // ListResponse.Validate if the designated constraints aren't met.
@@ -639,20 +859,39 @@ var _ interface {
 } = ListResponseValidationError{}
 
 // Validate checks the field values on GetRequest with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *GetRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in GetRequestMultiError, or
+// nil if none found.
+func (m *GetRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if wrapper := m.GetId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return GetRequestValidationError{
+			err = GetRequestValidationError{
 				field:  "Id",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -660,11 +899,15 @@ func (m *GetRequest) Validate() error {
 	if wrapper := m.GetBoardId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return GetRequestValidationError{
+			err = GetRequestValidationError{
 				field:  "BoardId",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -672,10 +915,14 @@ func (m *GetRequest) Validate() error {
 	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
-			return GetRequestValidationError{
+			err := GetRequestValidationError{
 				field:  "Title",
 				reason: "value length must be at least 2 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -683,10 +930,14 @@ func (m *GetRequest) Validate() error {
 	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return GetRequestValidationError{
+			err := GetRequestValidationError{
 				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -694,10 +945,14 @@ func (m *GetRequest) Validate() error {
 	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return GetRequestValidationError{
+			err := GetRequestValidationError{
 				field:  "Category",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -705,28 +960,40 @@ func (m *GetRequest) Validate() error {
 	if wrapper := m.GetPassword(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
-			return GetRequestValidationError{
+			err := GetRequestValidationError{
 				field:  "Password",
 				reason: "value length must be at least 5 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetTags()) > 20 {
-		return GetRequestValidationError{
+		err := GetRequestValidationError{
 			field:  "Tags",
 			reason: "value must contain no more than 20 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if wrapper := m.GetContent(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return GetRequestValidationError{
+			err := GetRequestValidationError{
 				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -734,11 +1001,15 @@ func (m *GetRequest) Validate() error {
 	if wrapper := m.GetEmail(); wrapper != nil {
 
 		if err := m._validateEmail(wrapper.GetValue()); err != nil {
-			return GetRequestValidationError{
+			err = GetRequestValidationError{
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -746,14 +1017,21 @@ func (m *GetRequest) Validate() error {
 	if wrapper := m.GetWriter(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return GetRequestValidationError{
+			err := GetRequestValidationError{
 				field:  "Writer",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return GetRequestMultiError(errors)
+	}
 	return nil
 }
 
@@ -815,6 +1093,22 @@ func (m *GetRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
+// GetRequestMultiError is an error wrapping multiple validation errors
+// returned by GetRequest.ValidateAll() if the designated constraints aren't met.
+type GetRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetRequestMultiError) AllErrors() []error { return m }
+
 // GetRequestValidationError is the validation error returned by
 // GetRequest.Validate if the designated constraints aren't met.
 type GetRequestValidationError struct {
@@ -871,8 +1165,33 @@ var _ interface {
 
 // Validate is disabled for GetResponse. This method will always return nil.
 func (m *GetResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for GetResponse. This method will always return nil.
+func (m *GetResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetResponse) validate(all bool) error {
 	return nil
 }
+
+// GetResponseMultiError is an error wrapping multiple validation errors
+// returned by GetResponse.ValidateAll() if the designated constraints aren't met.
+type GetResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetResponseMultiError) AllErrors() []error { return m }
 
 // GetResponseValidationError is the validation error returned by
 // GetResponse.Validate if the designated constraints aren't met.
@@ -929,21 +1248,39 @@ var _ interface {
 } = GetResponseValidationError{}
 
 // Validate checks the field values on CreateRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *CreateRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on CreateRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in CreateRequestMultiError, or
+// nil if none found.
+func (m *CreateRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreateRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if wrapper := m.GetBoardId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return CreateRequestValidationError{
+			err = CreateRequestValidationError{
 				field:  "BoardId",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -951,10 +1288,14 @@ func (m *CreateRequest) Validate() error {
 	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
-			return CreateRequestValidationError{
+			err := CreateRequestValidationError{
 				field:  "Title",
 				reason: "value length must be at least 2 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -962,10 +1303,14 @@ func (m *CreateRequest) Validate() error {
 	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return CreateRequestValidationError{
+			err := CreateRequestValidationError{
 				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -973,10 +1318,14 @@ func (m *CreateRequest) Validate() error {
 	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return CreateRequestValidationError{
+			err := CreateRequestValidationError{
 				field:  "Category",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -984,28 +1333,40 @@ func (m *CreateRequest) Validate() error {
 	if wrapper := m.GetPassword(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
-			return CreateRequestValidationError{
+			err := CreateRequestValidationError{
 				field:  "Password",
 				reason: "value length must be at least 5 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetTags()) > 20 {
-		return CreateRequestValidationError{
+		err := CreateRequestValidationError{
 			field:  "Tags",
 			reason: "value must contain no more than 20 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if wrapper := m.GetContent(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return CreateRequestValidationError{
+			err := CreateRequestValidationError{
 				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1013,11 +1374,15 @@ func (m *CreateRequest) Validate() error {
 	if wrapper := m.GetEmail(); wrapper != nil {
 
 		if err := m._validateEmail(wrapper.GetValue()); err != nil {
-			return CreateRequestValidationError{
+			err = CreateRequestValidationError{
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1025,14 +1390,21 @@ func (m *CreateRequest) Validate() error {
 	if wrapper := m.GetWriter(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return CreateRequestValidationError{
+			err := CreateRequestValidationError{
 				field:  "Writer",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return CreateRequestMultiError(errors)
+	}
 	return nil
 }
 
@@ -1094,6 +1466,23 @@ func (m *CreateRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
+// CreateRequestMultiError is an error wrapping multiple validation errors
+// returned by CreateRequest.ValidateAll() if the designated constraints
+// aren't met.
+type CreateRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreateRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreateRequestMultiError) AllErrors() []error { return m }
+
 // CreateRequestValidationError is the validation error returned by
 // CreateRequest.Validate if the designated constraints aren't met.
 type CreateRequestValidationError struct {
@@ -1150,8 +1539,34 @@ var _ interface {
 
 // Validate is disabled for CreateResponse. This method will always return nil.
 func (m *CreateResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for CreateResponse. This method will always return nil.
+func (m *CreateResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *CreateResponse) validate(all bool) error {
 	return nil
 }
+
+// CreateResponseMultiError is an error wrapping multiple validation errors
+// returned by CreateResponse.ValidateAll() if the designated constraints
+// aren't met.
+type CreateResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m CreateResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m CreateResponseMultiError) AllErrors() []error { return m }
 
 // CreateResponseValidationError is the validation error returned by
 // CreateResponse.Validate if the designated constraints aren't met.
@@ -1208,21 +1623,39 @@ var _ interface {
 } = CreateResponseValidationError{}
 
 // Validate checks the field values on UpdateRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *UpdateRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on UpdateRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in UpdateRequestMultiError, or
+// nil if none found.
+func (m *UpdateRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if wrapper := m.GetId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return UpdateRequestValidationError{
+			err = UpdateRequestValidationError{
 				field:  "Id",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1230,11 +1663,15 @@ func (m *UpdateRequest) Validate() error {
 	if wrapper := m.GetBoardId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return UpdateRequestValidationError{
+			err = UpdateRequestValidationError{
 				field:  "BoardId",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1242,10 +1679,14 @@ func (m *UpdateRequest) Validate() error {
 	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
-			return UpdateRequestValidationError{
+			err := UpdateRequestValidationError{
 				field:  "Title",
 				reason: "value length must be at least 2 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1253,10 +1694,14 @@ func (m *UpdateRequest) Validate() error {
 	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return UpdateRequestValidationError{
+			err := UpdateRequestValidationError{
 				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1264,10 +1709,14 @@ func (m *UpdateRequest) Validate() error {
 	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return UpdateRequestValidationError{
+			err := UpdateRequestValidationError{
 				field:  "Category",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1275,28 +1724,40 @@ func (m *UpdateRequest) Validate() error {
 	if wrapper := m.GetPassword(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
-			return UpdateRequestValidationError{
+			err := UpdateRequestValidationError{
 				field:  "Password",
 				reason: "value length must be at least 5 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetTags()) > 20 {
-		return UpdateRequestValidationError{
+		err := UpdateRequestValidationError{
 			field:  "Tags",
 			reason: "value must contain no more than 20 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if wrapper := m.GetContent(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return UpdateRequestValidationError{
+			err := UpdateRequestValidationError{
 				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1304,11 +1765,15 @@ func (m *UpdateRequest) Validate() error {
 	if wrapper := m.GetEmail(); wrapper != nil {
 
 		if err := m._validateEmail(wrapper.GetValue()); err != nil {
-			return UpdateRequestValidationError{
+			err = UpdateRequestValidationError{
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1316,14 +1781,21 @@ func (m *UpdateRequest) Validate() error {
 	if wrapper := m.GetWriter(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return UpdateRequestValidationError{
+			err := UpdateRequestValidationError{
 				field:  "Writer",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return UpdateRequestMultiError(errors)
+	}
 	return nil
 }
 
@@ -1385,6 +1857,23 @@ func (m *UpdateRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
+// UpdateRequestMultiError is an error wrapping multiple validation errors
+// returned by UpdateRequest.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateRequestMultiError) AllErrors() []error { return m }
+
 // UpdateRequestValidationError is the validation error returned by
 // UpdateRequest.Validate if the designated constraints aren't met.
 type UpdateRequestValidationError struct {
@@ -1441,8 +1930,34 @@ var _ interface {
 
 // Validate is disabled for UpdateResponse. This method will always return nil.
 func (m *UpdateResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for UpdateResponse. This method will always return nil.
+func (m *UpdateResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *UpdateResponse) validate(all bool) error {
 	return nil
 }
+
+// UpdateResponseMultiError is an error wrapping multiple validation errors
+// returned by UpdateResponse.ValidateAll() if the designated constraints
+// aren't met.
+type UpdateResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m UpdateResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m UpdateResponseMultiError) AllErrors() []error { return m }
 
 // UpdateResponseValidationError is the validation error returned by
 // UpdateResponse.Validate if the designated constraints aren't met.
@@ -1499,21 +2014,39 @@ var _ interface {
 } = UpdateResponseValidationError{}
 
 // Validate checks the field values on DeleteRequest with the rules defined in
-// the proto definition for this message. If any rules are violated, an error
-// is returned.
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
 func (m *DeleteRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DeleteRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in DeleteRequestMultiError, or
+// nil if none found.
+func (m *DeleteRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteRequest) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
+	var errors []error
+
 	if wrapper := m.GetId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return DeleteRequestValidationError{
+			err = DeleteRequestValidationError{
 				field:  "Id",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1521,11 +2054,15 @@ func (m *DeleteRequest) Validate() error {
 	if wrapper := m.GetBoardId(); wrapper != nil {
 
 		if err := m._validateUuid(wrapper.GetValue()); err != nil {
-			return DeleteRequestValidationError{
+			err = DeleteRequestValidationError{
 				field:  "BoardId",
 				reason: "value must be a valid UUID",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1533,10 +2070,14 @@ func (m *DeleteRequest) Validate() error {
 	if wrapper := m.GetTitle(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 2 {
-			return DeleteRequestValidationError{
+			err := DeleteRequestValidationError{
 				field:  "Title",
 				reason: "value length must be at least 2 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1544,10 +2085,14 @@ func (m *DeleteRequest) Validate() error {
 	if wrapper := m.GetSlug(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return DeleteRequestValidationError{
+			err := DeleteRequestValidationError{
 				field:  "Slug",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1555,10 +2100,14 @@ func (m *DeleteRequest) Validate() error {
 	if wrapper := m.GetCategory(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return DeleteRequestValidationError{
+			err := DeleteRequestValidationError{
 				field:  "Category",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1566,28 +2115,40 @@ func (m *DeleteRequest) Validate() error {
 	if wrapper := m.GetPassword(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 5 {
-			return DeleteRequestValidationError{
+			err := DeleteRequestValidationError{
 				field:  "Password",
 				reason: "value length must be at least 5 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
 	if len(m.GetTags()) > 20 {
-		return DeleteRequestValidationError{
+		err := DeleteRequestValidationError{
 			field:  "Tags",
 			reason: "value must contain no more than 20 item(s)",
 		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
 	}
 
 	if wrapper := m.GetContent(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return DeleteRequestValidationError{
+			err := DeleteRequestValidationError{
 				field:  "Content",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1595,11 +2156,15 @@ func (m *DeleteRequest) Validate() error {
 	if wrapper := m.GetEmail(); wrapper != nil {
 
 		if err := m._validateEmail(wrapper.GetValue()); err != nil {
-			return DeleteRequestValidationError{
+			err = DeleteRequestValidationError{
 				field:  "Email",
 				reason: "value must be a valid email address",
 				cause:  err,
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
@@ -1607,14 +2172,21 @@ func (m *DeleteRequest) Validate() error {
 	if wrapper := m.GetWriter(); wrapper != nil {
 
 		if utf8.RuneCountInString(wrapper.GetValue()) < 3 {
-			return DeleteRequestValidationError{
+			err := DeleteRequestValidationError{
 				field:  "Writer",
 				reason: "value length must be at least 3 runes",
 			}
+			if !all {
+				return err
+			}
+			errors = append(errors, err)
 		}
 
 	}
 
+	if len(errors) > 0 {
+		return DeleteRequestMultiError(errors)
+	}
 	return nil
 }
 
@@ -1676,6 +2248,23 @@ func (m *DeleteRequest) _validateUuid(uuid string) error {
 	return nil
 }
 
+// DeleteRequestMultiError is an error wrapping multiple validation errors
+// returned by DeleteRequest.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteRequestMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteRequestMultiError) AllErrors() []error { return m }
+
 // DeleteRequestValidationError is the validation error returned by
 // DeleteRequest.Validate if the designated constraints aren't met.
 type DeleteRequestValidationError struct {
@@ -1732,8 +2321,34 @@ var _ interface {
 
 // Validate is disabled for DeleteResponse. This method will always return nil.
 func (m *DeleteResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll is disabled for DeleteResponse. This method will always return nil.
+func (m *DeleteResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DeleteResponse) validate(all bool) error {
 	return nil
 }
+
+// DeleteResponseMultiError is an error wrapping multiple validation errors
+// returned by DeleteResponse.ValidateAll() if the designated constraints
+// aren't met.
+type DeleteResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DeleteResponseMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DeleteResponseMultiError) AllErrors() []error { return m }
 
 // DeleteResponseValidationError is the validation error returned by
 // DeleteResponse.Validate if the designated constraints aren't met.

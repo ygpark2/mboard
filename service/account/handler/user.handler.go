@@ -3,7 +3,8 @@ package handler
 import (
 	"context"
 
-	"github.com/jinzhu/gorm"
+	// "github.com/jinzhu/gorm"
+	"github.com/go-gorm/gorm"
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/auth"
 	"github.com/micro/micro/v3/service/errors"
