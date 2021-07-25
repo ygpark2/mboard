@@ -5,8 +5,8 @@ import (
 	// "time"
 
 	// "github.com/jinzhu/gorm"
-	"github.com/go-gorm/gorm"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 /**
@@ -17,7 +17,8 @@ import (
 // you can use this method to generate new UUID for CREATE operation or let database create it with this annotation:
 // {type: "uuid", primary_key: true, not_null:true, default: "uuid_generate_v4()"}];
 // we prefer First method as it works with both SQLite & PostgreSQL
-func (m *BoardORM) BeforeCreate(scope *gorm.Scope) error {
+func (m *BoardORM) BeforeCreate(tx *gorm.DB) (err error) {
 	uuid := uuid.NewV4()
-	return scope.SetColumn("Id", uuid.String())
+	tx.Statement.SetColumn("Id", uuid.String())
+	return nil
 }

@@ -4,13 +4,13 @@ import (
 	"context"
 
 	// "github.com/jinzhu/gorm"
-	"github.com/go-gorm/gorm"
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/auth"
 	"github.com/micro/micro/v3/service/errors"
 	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
 	"github.com/thoas/go-funk"
+	"gorm.io/gorm"
 
 	account_entities "github.com/ygpark2/mboard/service/account/proto/entities"
 	userPB "github.com/ygpark2/mboard/service/account/proto/user"

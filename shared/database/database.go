@@ -1,66 +1,94 @@
 package database
 
 import (
-    "fmt"
-    "strings"
+	"fmt"
+	"os"
+	"strings"
+	"time"
 
-    "github.com/jinzhu/gorm"
-    "github.com/rs/zerolog/log"
+	// "github.com/jinzhu/gorm"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	"gorm.io/gorm"
 
-    "github.com/ygpark2/mboard/shared/logger/gormlog"
-    configPB "github.com/ygpark2/mboard/shared/proto/config"
+	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
+
+	"gorm.io/gorm/logger"
+	"gorm.io/gorm/schema"
+
+	configPB "github.com/ygpark2/mboard/shared/proto/config"
 )
 
 // GetDatabaseConnection return (gorm.DB or error)
 func GetDatabaseConnection(dbConf configPB.DatabaseConfiguration) (db *gorm.DB, err error) {
-    var timezoneCommand string
+	var timezoneCommand string
 
-    switch dbConf.Dialect {
-    case configPB.DatabaseDialect_SQLite3:
-        db, err = connection(dbConf)
-    case configPB.DatabaseDialect_Postgre:
-        timezoneCommand = "SET timezone = 'UTC'"
-        db, err = connection(dbConf)
-    case configPB.DatabaseDialect_MySQL:
-        timezoneCommand = "SET time_zone = '+00:00'"
-        db, err = connection(dbConf)
-    default:
-        return nil, fmt.Errorf("database dialect %s not supported", dbConf.Dialect)
-    }
+	dsn, err := dbConf.DSN()
+	if err != nil {
+		return nil, err
+	}
 
-    if err != nil {
-        return
-    }
-    gLogger := log.With().
-        Str("module", "gorm").
-        Logger()
+	// gLogger := log.With().Str("module", "gorm").Logger()
 
-    db.SetLogger(gormlog.NewGormLogger(gLogger))
+	zlog := log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC822}).With().Caller().Logger()
+	newLogger := logger.New(
+		&zlog,
+		logger.Config{
+			SlowThreshold:             time.Second, // Slow SQL threshold
+			LogLevel:                  logger.Info, // Log level
+			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+			Colorful:                  false,       // Disable color
+		},
+	)
 
-    if dbConf.Logging {
-        db.Debug()
-    }
+	conf := &gorm.Config{
+		NamingStrategy: schema.NamingStrategy{
+			TablePrefix:   "t_",                              // table name prefix, table for `User` would be `t_users`
+			SingularTable: true,                              // use singular table name, table for `User` would be `user` with this option enabled
+			NameReplacer:  strings.NewReplacer("CID", "Cid"), // use name replacer to change struct/field name before convert it to db name
+		},
+		Logger: newLogger.LogMode(logger.Info), // gormlog.NewGormLogger(gLogger),
+		NowFunc: func() time.Time {
+			return time.Now().Local()
+		},
+		DryRun:      false,
+		PrepareStmt: false,
+	}
 
-    db.LogMode(dbConf.Logging)
-    db.SingularTable(dbConf.Singularize)
-    db.DB().SetMaxOpenConns(int(dbConf.MaxOpenConns))
-    db.DB().SetMaxIdleConns(int(dbConf.MaxIdleConns))
-    db.DB().SetConnMaxLifetime(*dbConf.ConnMaxLifetime)
+	switch dbConf.Dialect {
+	case configPB.DatabaseDialect_SQLite3:
+		db, err = gorm.Open(sqlite.Open(dsn), conf)
+	case configPB.DatabaseDialect_Postgre:
+		timezoneCommand = "SET timezone = 'UTC'"
+		db, err = gorm.Open(postgres.Open(dsn), conf)
+	case configPB.DatabaseDialect_MySQL:
+		timezoneCommand = "SET time_zone = '+00:00'"
+		db, err = gorm.Open(mysql.Open(dsn), conf)
+	default:
+		return nil, fmt.Errorf("database dialect %s not supported", dbConf.Dialect)
+	}
 
-    if dbConf.Utc {
-        if _, err = db.DB().Exec(timezoneCommand); err != nil {
-            return nil, fmt.Errorf("error setting UTC timezone: %w", err)
-        }
-    }
+	if err != nil {
+		return
+	}
 
-    return
-}
+	if dbConf.Logging {
+		db.Debug()
+	}
 
-func connection(dbConf configPB.DatabaseConfiguration) (db *gorm.DB, err error) {
-    url, err := dbConf.URL()
-    if err != nil {
-        return nil, err
-    }
-    db, err = gorm.Open(strings.ToLower(string(dbConf.Dialect.String())), url)
-    return
+	sqlDB, err := db.DB()
+
+	sqlDB.SetMaxOpenConns(int(dbConf.MaxOpenConns))
+	sqlDB.SetMaxIdleConns(int(dbConf.MaxIdleConns))
+	sqlDB.SetConnMaxLifetime(*dbConf.ConnMaxLifetime)
+
+	if dbConf.Utc {
+		if _, err = sqlDB.Exec(timezoneCommand); err != nil {
+			return nil, fmt.Errorf("error setting UTC timezone: %w", err)
+		}
+	}
+
+	return
 }

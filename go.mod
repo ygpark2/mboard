@@ -16,7 +16,6 @@ require (
 	github.com/infobloxopen/atlas-app-toolkit v0.22.1
 	github.com/infobloxopen/protoc-gen-gorm v0.20.1
 	github.com/jinzhu/gorm v1.9.16
-	github.com/jinzhu/now v1.1.1 // indirect
 	github.com/lib/pq v1.8.0
 	github.com/markbates/pkger v0.17.1
 	github.com/micro/go-micro v1.18.0
@@ -39,6 +38,10 @@ require (
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gorm.io/driver/mysql v1.1.1
+	gorm.io/driver/postgres v1.1.0
+	gorm.io/driver/sqlite v1.1.4
+	gorm.io/gorm v1.21.12
 )
 
 // exclude github.com/ygpark2/mboard v0.0.0-20201103090146-2c7cb3e5d3fa

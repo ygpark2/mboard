@@ -5,8 +5,8 @@ import (
 	"time"
 
 	// "github.com/jinzhu/gorm"
-	"github.com/go-gorm/gorm"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 )
 
 /**
