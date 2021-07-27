@@ -8,7 +8,8 @@ service/board/pkged.go:9:2: cannot find package "." in:
 "github.com/markbates/pkger/pkging/mem"
 This package is not generated due to the "pkged.go" file not existing.
 
-cd service/board/registry
-wire
-
+make tools
+make update_deps
+make proto
+make wire
 

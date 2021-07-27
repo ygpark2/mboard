@@ -116,9 +116,9 @@ func (h *BoardHandler) Create(ctx context.Context, req *boardPB.CreateRequest, r
 	logger.Info("Received boardHandler.Create request")
 
 	model := board_entities.BoardORM{}
-	title := req.Title.GetValue()
+	title := req.Title.Value
 	model.Title = &title
-	mobileTitle := req.MobileTitle.GetValue()
+	mobileTitle := req.MobileTitle.Value
 	model.MobileTitle = &mobileTitle
 	model.Description = req.Description
 	model.Notices = req.Notices

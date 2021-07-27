@@ -58,12 +58,40 @@ tools:
 	@echo "==> Installing dev tools"
 	GO111MODULE=off go get github.com/ahmetb/govvv
 	GO111MODULE=off go get github.com/markbates/pkger/cmd/pkger
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.34.1
+	GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint
 	GO111MODULE=on GOBIN=$(go env GOPATH)/bin go get \
 			github.com/bufbuild/buf/cmd/buf \
 			github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking \
 			github.com/bufbuild/buf/cmd/protoc-gen-buf-lint
+
+	# fetch protoc plugins into $GOPATH
+	GO111MODULE=off go get github.com/golang/protobuf/proto
+	GO111MODULE=off go get github.com/golang/protobuf/protoc-gen-go
+	# go get -u google.golang.org/protobuf/cmd/protoc-gen-go
+
+	GO111MODULE=on go get github.com/micro/micro/v3/cmd/protoc-gen-micro
+
+	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gofast
+	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gogofast
+	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gogofaster
+	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gogoslick
+
+	GO111MODULE=off go get -u github.com/envoyproxy/protoc-gen-validate
+	GO111MODULE=off go get -u github.com/infobloxopen/protoc-gen-gorm
+
+	GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+	# kind - kubernetes in docker (optional)
+	GO111MODULE=on go get sigs.k8s.io/kind
+	# go lang  build/publish/deploy tool (optional)
+	GO111MODULE=off go get github.com/google/ko/cmd/ko
+	# other way to get latest kustomize
+	GO111MODULE=on go get sigs.k8s.io/kustomize/kustomize/v3@v3.3.0
+
 	GO111MODULE=on go get github.com/google/wire/cmd/wire
+
+	# goup checks if there are any updates for imports in your module.
+	# the main purpose is using it as a linter in continuous integration or in development process.
+	# Usage: goup -v -m ./...
 	GO111MODULE=on go get github.com/rvflash/goup
 
 check_dirty:
@@ -80,9 +108,27 @@ clean:
 		echo "Deleting $$f;"; \
 		rm -f $$f; \
 	done
-	@for f in */*/*/wire_gen.go ; do \
+	@for f in service/*/registry/wire_gen.go ; do \
 		echo "Deleting $$f;"; \
 		rm -f $$f; \
+	done
+	@for f in service/*/proto/*/*.go ; do \
+		echo "Deleting $$f;"; \
+		VAR := $$f; \
+		ENDS_WITH := gorm.override.go; \
+		ifeq ($(patsubst %$(ENDS_WITH),,$(lastword VAR)),)
+			@echo "$(VAR) ends with $(ENDS_WITH)"
+			# Do Y
+		else
+			@echo "$(VAR) doesn't end with $(ENDS_WITH)"
+			# Do X
+		endif
+	done
+
+wire:
+	@for f in service/*/registry/ ; do \
+		echo "Executing wire command $$f"; \
+		wire gen ./$$f; \
 	done
 
 update_deps:
