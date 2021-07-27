@@ -8,8 +8,8 @@ import (
 	fmt "fmt"
 	_ "github.com/envoyproxy/protoc-gen-validate/validate"
 
-	timestamp "github.com/golang/protobuf/ptypes/timestamp"
-	wrappers "github.com/golang/protobuf/ptypes/wrappers"
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/golang/protobuf/ptypes/wrappers"
 	_ "github.com/infobloxopen/protoc-gen-gorm/options"
 	_ "github.com/infobloxopen/protoc-gen-gorm/types"
 	math "math"
