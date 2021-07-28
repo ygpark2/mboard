@@ -238,13 +238,13 @@ endif
 			for _target in $${type}/*/; do \
 				temp=$${_target%%/}; target=$${temp#*/}; \
 				echo "\tBuilding $${target}-$${type}"; \
-				wire ./$${type}/$${target}/registry/wire.go; \
+				wire gen ./$${type}/$${target}/registry/; \
 				CGO_ENABLED=0 GOOS=linux go build -mod=vendor -o build/$${target}-$${type} -a -trimpath -ldflags "-w -s ${BUILD_FLAGS}" ./$${type}/$${target}; \
 			done \
 		done \
 	else \
 		echo "Building ${TARGET}-${TYPE}"; \
-		cd ./${TYPE}/${TARGET}/registry/ && wire && cd ../../..; \
+		wire gen ./${TYPE}/${TARGET}/registry/; \
 		go build -mod=vendor -o build/${TARGET}-${TYPE} -a -trimpath -ldflags "-w -s ${BUILD_FLAGS}" ./${TYPE}/${TARGET}; \
 	fi
 

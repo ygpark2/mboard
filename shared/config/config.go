@@ -3,10 +3,8 @@ package config
 import (
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"sync"
@@ -56,54 +54,12 @@ func init() {
 
 	log.Debug().Msg("++++++++++++++++++++++++++++ start init function +++++++++++++++++++++++++++++")
 
-	err := filepath.Walk("../../config", func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		fmt.Println(path, info.Size())
-		return nil
-	})
-
-	if err != nil {
-		log.Panic().Err(err).Msg("error ==========")
-	}
-
-	log.Debug().Msg("++++++++++++++++++++++++++++ end of content +++++++++++++++++++++++++++++")
-
-	rootFiles, errRoot := ioutil.ReadDir("/")
-	if errRoot != nil {
-		log.Panic().Err(errRoot).Msg("error ==========")
-	}
-
-	for _, file := range rootFiles {
-		fmt.Println(file.Name())
-	}
-
-	shell, exists := os.LookupEnv("SHELL")
-	if exists {
-		log.Info().Msgf("Shell info : %s", shell)
-	}
-	goroot, exists := os.LookupEnv("GOROOT")
-	if exists {
-		log.Info().Msgf("GOROOT info : %s", goroot)
-	}
-	gopath, exists := os.LookupEnv("GOPATH")
-	if exists {
-		log.Info().Msgf("GOPATH info : %s", gopath)
-	}
-	configFilePath, exists := os.LookupEnv("CONFIGOR_FILE_PATH")
-	if exists {
-		log.Info().Msgf("CONFIGOR_FILE_PATH info : %s", configFilePath)
-	}
-
 	configPath, exists := os.LookupEnv("CONFIGOR_FILE_PATH")
-	log.Info().Msgf("First loading configuration from file: %s", configPath)
 	if !exists {
-		// configPath = "/home/ygpark2/pjt/golang/mboard/config/config.yaml"
-		configPath = "../../config/config.yaml"
+		configPath = "/config/config.yaml"
 	}
 
-	Configor = configor.New(&configor.Config{UsePkger: false, ErrorOnUnmatchedKeys: true})
+	Configor = configor.New(&configor.Config{UsePkger: true, ErrorOnUnmatchedKeys: true})
 	log.Info().Msgf("loading configuration from file: %s", configPath)
 	if err := Configor.Load(&cfg, configPath); err != nil {
 		if strings.Contains(err.Error(), "no such file") {
@@ -112,6 +68,7 @@ func init() {
 			log.Fatal().Err(err).Send()
 		}
 	}
+
 }
 
 /**
