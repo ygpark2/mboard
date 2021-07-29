@@ -8,9 +8,9 @@ import (
 
 	"github.com/gosimple/slug"
 	"github.com/micro/micro/v3/service/errors"
-	gostore "github.com/micro/micro/v3/service/store"
 	"github.com/micro/micro/v3/service/logger"
-	pb "github.com/micro/services/blog/tags/proto"
+	gostore "github.com/micro/micro/v3/service/store"
+	pb "github.com/ygpark2/mboard/service/tags/proto"
 )
 
 const (

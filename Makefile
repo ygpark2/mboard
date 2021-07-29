@@ -59,33 +59,33 @@ tools:
 	GO111MODULE=off go get github.com/ahmetb/govvv
 	GO111MODULE=off go get github.com/markbates/pkger/cmd/pkger
 	GO111MODULE=on go get github.com/golangci/golangci-lint/cmd/golangci-lint
-	GO111MODULE=on GOBIN=$(go env GOPATH)/bin go get \
-			github.com/bufbuild/buf/cmd/buf \
-			github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking \
-			github.com/bufbuild/buf/cmd/protoc-gen-buf-lint
+	GO111MODULE=on go get github.com/bufbuild/buf/cmd/buf \
+							github.com/bufbuild/buf/cmd/protoc-gen-buf-breaking \
+							github.com/bufbuild/buf/cmd/protoc-gen-buf-lint
 
 	# fetch protoc plugins into $GOPATH
-	GO111MODULE=off go get github.com/golang/protobuf/proto
-	GO111MODULE=off go get github.com/golang/protobuf/protoc-gen-go
-	# go get -u google.golang.org/protobuf/cmd/protoc-gen-go
+	GO111MODULE=on go get github.com/golang/protobuf/proto \
+							github.com/golang/protobuf/protoc-gen-go
 
 	GO111MODULE=on go get github.com/micro/micro/v3/cmd/protoc-gen-micro
 
-	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gofast
-	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gogofast
-	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gogofaster
-	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gogoslick
+	GO111MODULE=on go get github.com/gogo/protobuf/protoc-gen-gofast \
+							github.com/gogo/protobuf/protoc-gen-gogofast \
+							github.com/gogo/protobuf/protoc-gen-gogofaster \
+							github.com/gogo/protobuf/protoc-gen-gogoslick
 
 	GO111MODULE=off go get -u github.com/envoyproxy/protoc-gen-validate
 	GO111MODULE=off go get -u github.com/infobloxopen/protoc-gen-gorm
 
-	GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+	# GO111MODULE=on go get google.golang.org/grpc@v1.30.0 # prototool 설치를 위해서는 grpc 버전을 다운 그레이드 해야함 
+	# GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+
 	# kind - kubernetes in docker (optional)
-	GO111MODULE=on go get sigs.k8s.io/kind
+	# GO111MODULE=on go get sigs.k8s.io/kind
 	# go lang  build/publish/deploy tool (optional)
-	GO111MODULE=off go get github.com/google/ko/cmd/ko
+	# GO111MODULE=on go get github.com/google/ko/cmd/ko
 	# other way to get latest kustomize
-	GO111MODULE=on go get sigs.k8s.io/kustomize/kustomize/v3@v3.3.0
+	# GO111MODULE=on go get sigs.k8s.io/kustomize/kustomize/v3@v3.3.0
 
 	GO111MODULE=on go get github.com/google/wire/cmd/wire
 

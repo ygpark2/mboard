@@ -9,7 +9,7 @@ import (
 	"github.com/micro/micro/v3/service/auth"
 	"github.com/micro/micro/v3/service/logger"
 
-	// tags "github.com/micro/services/blog/tags/proto"
+	// tags "github.com/ygpark2/services/tags/proto"
 
 	"github.com/ygpark2/mboard/shared/config"
 	"github.com/ygpark2/mboard/shared/constants"

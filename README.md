@@ -8,6 +8,8 @@ service/board/pkged.go:9:2: cannot find package "." in:
 "github.com/markbates/pkger/pkging/mem"
 This package is not generated due to the "pkged.go" file not existing.
 
+## 기본 셑업 명령어
+
 make tools
 make update_deps
 make proto
@@ -29,3 +31,17 @@ make build TYPE=service TARGET=board VERSION=v0.1.1
 
 make pkger TYPE=service TARGET=board VERSION=v0.1.1
 
+## 에러
+
+GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+github.com/uber/prototool/cmd/prototool imports
+        github.com/uber/prototool/internal/cmd imports
+        github.com/uber/prototool/internal/exec imports
+        github.com/uber/prototool/internal/grpc imports
+        github.com/fullstorydev/grpcurl imports
+        google.golang.org/grpc/xds/experimental: cannot find module providing package google.golang.org/grpc/xds/experimental
+
+prototool 설치시 다음과 같은 에러가 발생할 경우 grpc를 다운 그레이드 해야함
+go get google.golang.org/grpc@v1.30.0
+
+최신 버전에서는 xds 모듈이 사라졌음

@@ -1,10 +1,10 @@
 package repository
 
 import (
-	"github.com/jinzhu/gorm"
+	"github.com/micro/micro/v3/service/logger"
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	uuid "github.com/satori/go.uuid"
+	"gorm.io/gorm"
 
 	comment_entities "github.com/ygpark2/mboard/service/comment/proto/entities"
 )
